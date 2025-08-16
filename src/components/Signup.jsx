@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';  
+import { baseURL } from '../utils/environments';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const Signup = () => {
         formdata.append("profile_photo", profilePhoto);
       } 
 
-      const res = await fetch('http://localhost:8080/api/auth/register', {
+      const res = await fetch(baseURL+'/auth/register', {
         method: 'POST',
 
         body: formdata,
