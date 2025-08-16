@@ -17,13 +17,13 @@ const My_Cars = () => {
     if (window.confirm('Are you sure you want to delete this vehicle?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:8080/api/cars/${carId}`, {
+        await axios.delete(`${baseURL}/cars/${carId}`, {
 
           headers: { 
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
-          
+
         });
         
         UIkit.notification({
@@ -82,7 +82,7 @@ const My_Cars = () => {
       setError(null);
 
       try {
-        const response = await fetch('http://localhost:8080/api/cars/my', {
+        const response = await fetch('${baseURL}/cars/my', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,

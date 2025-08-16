@@ -25,7 +25,7 @@ const ProfileEdit = () => {
 
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/user/${id}`, {
+        const response = await axios.get(`${baseURL}/user/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -107,7 +107,7 @@ const ProfileEdit = () => {
         formData.append('profile_photo', profilePhoto);
       }
 
-      await axios.put(`http://localhost:8080/api/user/${id}`, formData, {
+      await axios.put(`${baseURL}/user/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
