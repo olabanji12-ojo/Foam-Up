@@ -12,9 +12,10 @@ const ProfileEdit = () => {
     name: '',
     email: '',
     phone: '',
-    // account_type: '',
-    // role: ''
+    profile_photo: ''
   });
+  const [profilePhoto, setProfilePhoto] = useState(null); // For new file upload
+  const [previewImage, setPreviewImage] = useState(null); // For image preview
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +30,12 @@ const ProfileEdit = () => {
             Authorization: `Bearer ${token}`
           }
         });
-        setProfile(response.data.data);
+        const userData = response.data.data;
+        setProfile(userData);
+        // Set current profile photo as preview if exists
+        if (userData.profile_photo) {
+          setPreviewImage(userData.profile_photo);
+        }
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load profile');
         UIkit.notification({
@@ -59,14 +65,52 @@ const ProfileEdit = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setProfilePhoto(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setProfilePhoto(null);
+    setPreviewImage(profile.profile_photo || null); // Revert to original or null
+    // Clear file input
+    const fileInput = document.querySelector('input[name="profile_photo"]');
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      await axios.put(`http://localhost:8080/api/user/${id}`, profile, {
+      // Create FormData for multipart upload
+      const formData = new FormData();
+      
+      // Add profile fields
+      formData.append('name', profile.name);
+      formData.append('email', profile.email);
+      formData.append('phone', profile.phone);
+      
+      // Add profile photo if selected
+      if (profilePhoto) {
+        formData.append('profile_photo', profilePhoto);
+      }
+
+      await axios.put(`http://localhost:8080/api/user/${id}`, formData, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
         }
       });
       
@@ -145,6 +189,104 @@ const ProfileEdit = () => {
                  borderRadius: '16px',
                  border: '1px solid #334155'
                }}>
+            
+            {/* Profile Photo Section */}
+            <div className="uk-margin-large-bottom uk-text-center">
+              <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>Profile Photo</h3>
+              
+              {/* Current/Preview Image */}
+              <div className="uk-margin-bottom">
+                <div className="uk-border-circle uk-display-inline-block" 
+                     style={{
+                       width: '150px',
+                       height: '150px',
+                       overflow: 'hidden',
+                       position: 'relative',
+                       border: '3px solid #64748b'
+                     }}>
+                  {previewImage ? (
+                    <img 
+                      src={previewImage} 
+                      alt="Profile preview"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <span uk-icon="icon: user; ratio: 3" style={{ color: 'white' }}></span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* File Upload Input */}
+              <div className="uk-margin-bottom">
+                <div className="uk-form-controls uk-text-center">
+                  <label style={{ 
+                    display: 'inline-block',
+                    cursor: 'pointer',
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                    color: 'white',
+                    padding: '10px 20px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}>
+                    <span uk-icon="icon: camera; ratio: 0.8" className="uk-margin-small-right"></span>
+                    Choose New Photo
+                    <input 
+                      type="file" 
+                      name="profile_photo"
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Remove/Reset Button */}
+              {(profilePhoto || previewImage !== profile.profile_photo) && (
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="uk-button uk-button-default uk-button-small"
+                  style={{
+                    borderColor: '#ef4444',
+                    color: '#ef4444',
+                    borderRadius: '15px'
+                  }}
+                >
+                  <span uk-icon="icon: close; ratio: 0.7" className="uk-margin-small-right"></span>
+                  Reset Photo
+                </button>
+              )}
+              
+              {/* File Info */}
+              {profilePhoto && (
+                <div style={{ 
+                  marginTop: '10px',
+                  fontSize: '12px',
+                  color: '#94a3b8'
+                }}>
+                  Selected: {profilePhoto.name} ({(profilePhoto.size / 1024 / 1024).toFixed(2)} MB)
+                </div>
+              )}
+            </div>
+
+            {/* Form Fields */}
             <form onSubmit={handleSubmit}>
               <fieldset className="uk-fieldset">
                 <div className="uk-margin">
@@ -157,7 +299,7 @@ const ProfileEdit = () => {
                       value={profile.name || ''}
                       onChange={handleChange}
                       style={{ 
-                        backgroundColor: '#334155',
+                        backgroundColor: '#334155', 
                         color: '#f1f5f9',
                         borderColor: '#64748b'
                       }}
@@ -203,45 +345,6 @@ const ProfileEdit = () => {
                   </div>
                 </div>
 
-                {/* Commented out for future implementation */}
-                {/* <div className="uk-margin">
-                  <label className="uk-form-label" style={{ color: '#f1f5f9' }}>Account Type</label>
-                  <div className="uk-form-controls">
-                    <input 
-                      className="uk-input" 
-                      type="text" 
-                      name="account_type"
-                      value={profile.account_type || ''}
-                      onChange={handleChange}
-                      style={{ 
-                        backgroundColor: '#334155',
-                        color: '#f1f5f9',
-                        borderColor: '#64748b'
-                      }}
-                      disabled
-                    />
-                  </div>
-                </div>
-
-                <div className="uk-margin">
-                  <label className="uk-form-label" style={{ color: '#f1f5f9' }}>Role</label>
-                  <div className="uk-form-controls">
-                    <input 
-                      className="uk-input" 
-                      type="text" 
-                      name="role"
-                      value={profile.role || ''}
-                      onChange={handleChange}
-                      style={{ 
-                        backgroundColor: '#334155',
-                        color: '#f1f5f9',
-                        borderColor: '#64748b'
-                      }}
-                      disabled
-                    />
-                  </div>
-                </div> */}
-
                 <div className="uk-margin-top">
                   <button
                     type="submit"
@@ -251,17 +354,23 @@ const ProfileEdit = () => {
                       background: 'linear-gradient(135deg, #10b981, #06b6d4)',
                       borderRadius: '20px',
                       marginRight: '10px'
-                    }}
-                  >
+                    }}>
+
                     {isSubmitting ? (
                       <>
                         <span uk-spinner="ratio: 0.6"></span> Saving...
                       </>
-                    ) : 'Save Changes'}
+                    ) : (
+                      <>
+                        <span uk-icon="icon: check; ratio: 0.8" className="uk-margin-small-right"></span>
+                        Save Changes
+                      </>
+                    )}
                   </button>
 
-                  <Link
-                    to={`Profile/${id}`}
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/profile/${id}`)}
                     className="uk-button uk-button-default"
                     style={{
                       borderRadius: '20px',
@@ -269,8 +378,9 @@ const ProfileEdit = () => {
                       color: '#94a3b8'
                     }}
                   >
+                    <span uk-icon="icon: arrow-left; ratio: 0.8" className="uk-margin-small-right"></span>
                     Cancel
-                  </Link>
+                  </button>
                 </div>
               </fieldset>
             </form>

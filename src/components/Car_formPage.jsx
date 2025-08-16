@@ -19,7 +19,7 @@ const Car_formPage = () => {
 
   const [formData, setFormData] = useState({
     model: '',
-    plate: '',
+    plate: '',  
     color: '',
     profile_photo: '',
     isDefault: false,

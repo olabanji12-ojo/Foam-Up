@@ -8,7 +8,7 @@ const Customer_dashboard = () => {
   // Add CSS animations for floating elements
   React.useEffect(() => {
     const style = document.createElement('style');
-    style.textContent = `
+    style.textContent = ` 
       @keyframes float {
         0%, 100% { transform: translateY(0px) rotate(0deg); }
         50% { transform: translateY(-20px) rotate(180deg); }
@@ -295,7 +295,7 @@ const Customer_dashboard = () => {
                 
                 {/* My Cars */}
 
-                <Link to="/My_Cars"> 
+            
 
                 <div>
                   <div 
@@ -320,6 +320,8 @@ const Customer_dashboard = () => {
                       e.currentTarget.style.transform = 'translateY(0)';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
+
+                    
                   >
                     <div style={{
                       position: 'absolute',
@@ -333,13 +335,22 @@ const Customer_dashboard = () => {
                     
                     <span uk-icon="icon: car; ratio: 1.5" style={{ color: '#f59e0b', position: 'relative', zIndex: 2 }}></span>
                     
+                     <Link 
+                     
+                     style={
+                      {
+                        textDecoration: "none"
+                      }
+                     }
+                     to="/My_Cars">
                     <h4 className="uk-margin-small-top uk-margin-remove-bottom" style={{ color: '#f1f5f9', position: 'relative', zIndex: 2 }}>My Vehicles</h4>
                     <p className="uk-text-small uk-margin-small-top" style={{ color: '#94a3b8', position: 'relative', zIndex: 2 }}>Manage your cars</p>
+                    </Link>
                   </div>
+
                 </div>
 
-                </Link>
-
+                
                 {/* Recent Bookings */}
                 <div>
                   <div 

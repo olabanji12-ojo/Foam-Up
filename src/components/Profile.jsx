@@ -23,7 +23,6 @@ const Profile = () => {
           }
         });
          
-        // Changed from response.data.data to response.data
         setProfile(response.data.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load profile');
@@ -36,6 +35,7 @@ const Profile = () => {
         setLoading(false);
       }
     };
+    
 
     fetchProfile();
   }, [authUser?.id, token, authLoading]);
@@ -107,18 +107,66 @@ const Profile = () => {
             <div className="uk-grid-medium" data-uk-grid>
               <div className="uk-width-1-4@s">
                 <div className="uk-card uk-card-body uk-text-center">
+                  {/*  UPDATED: Display Cloudinary Image or Default Avatar */}
                   <div className="uk-border-circle" 
                        style={{
                          width: '120px',
                          height: '120px',
-                         background: 'linear-gradient(135deg, #10b981, #06b6d4)',
                          margin: '0 auto',
-                         display: 'flex',
-                         alignItems: 'center',
-                         justifyContent: 'center'
+                         overflow: 'hidden', // Important for circular image
+                         position: 'relative' 
+
                        }}>
-                    <span uk-icon="icon: user; ratio: 2" style={{ color: 'white' }}></span>
+                    {profile?.profile_photo ? (
+                      // Display Cloudinary image if available
+                      <img 
+                        src={profile.profile_photo} 
+                        alt={`${profile.name}'s profile`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover', // Ensures image covers the circle properly
+                          objectPosition: 'center'
+                        }}
+                        onError={(e) => {
+                          // Fallback to default avatar if image fails to load
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    
+                    {/* Default Avatar - shows if no profile photo or image fails */}
+                    <div 
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+                        display: profile?.profile_photo ? 'none' : 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '50%'
+                      }}
+                    >
+                      <span uk-icon="icon: user; ratio: 2" style={{ color: 'white' }}></span>
+                    </div>
                   </div>
+                  
+                  {/* ✨ NEW: Image upload status indicator */}
+                  {profile?.profile_photo && (
+                    <div style={{ 
+                      marginTop: '8px',
+                      fontSize: '12px',
+                      color: '#10b981',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}>
+                      <span uk-icon="icon: check; ratio: 0.8"></span>
+                      Profile Photo
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -153,12 +201,9 @@ const Profile = () => {
                       </div>
                     </div>
                     
-                    
                     <div className="uk-margin-top">
-                        
                       <button
                         className="uk-button uk-button-primary"
-        
                         style={{
                           background: 'linear-gradient(135deg, #f59e0b, #d97706)',
                           borderRadius: '20px'
@@ -166,17 +211,16 @@ const Profile = () => {
                       >
                         <span uk-icon="icon: pencil" className="uk-margin-small-right"></span>
                         <Link
-                        to={`/Profile_Edit/${profile?.id}`}
-                        style={{
-                          color: '#f1f5f9',
-                          textDecoration: 'none',
-                        }}
+                          to={`/Profile_Edit/${profile?.id}`}
+                          style={{
+                            color: '#f1f5f9',
+                            textDecoration: 'none',
+                          }}
                         >
-                        Edit Profile 
+                          Edit Profile 
                         </Link>
                       </button>
                     </div>
-
                   </div>
                 </div>
               </div>

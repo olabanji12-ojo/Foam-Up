@@ -5,14 +5,17 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+
     name: '',
     email: '',
     phone: '',
     password: '',
     account_type: '',
     role: '',
+
   });
 
+  const [profilePhoto, setProfilePhoto] = useState(null)
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -22,21 +25,36 @@ const Signup = () => {
       [e.target.name]: e.target.value
     });
   };
+   
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfilePhoto(e.target.files[0]);
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    try {
+    try { 
+
+      const formdata = new FormData();
+      Object.keys(formData).forEach((key) => {
+        formdata.append(key, formData[key]);
+      });
+      if (profilePhoto) {
+        formdata.append("profile_photo", profilePhoto);
+      } 
+
       const res = await fetch('http://localhost:8080/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
 
+        body: formdata,
+
+      });
+ 
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.message || 'Registration failed');
@@ -250,6 +268,50 @@ const Signup = () => {
               </div>
             </div>
 
+            {/* Profile Photo Input */}
+            <div className='uk-margin-bottom'>
+              <div className="uk-form-controls">
+                <div className="uk-form-label" style={{ 
+                  marginBottom: '8px',
+                  color: '#333',
+                  fontSize: '14px'
+                }}>
+                  
+                </div>
+                <div className="uk-inline uk-width-1-1">
+                  <input 
+                   
+                    cursor="pointer"
+                    type="file" 
+                    name="profile_photo"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="uk-input" 
+                    style={{
+                      border: '1px solid #ddd',
+                      borderRadius: '8px',
+                      padding: '12px 20px',
+                      fontSize: '16px',
+                      backgroundColor: '#ffffff',
+                      color: '#333',
+                      height: 'auto',
+                      boxShadow: 'none'
+                    }}
+                  />
+                </div>
+                {profilePhoto && (
+                  <div style={{ 
+                    marginTop: '8px',
+                    fontSize: '14px',
+                    color: '#666'
+                  }}>
+                    Selected: {profilePhoto.name}
+                  </div>
+                )}
+              </div>
+            </div>
+
+
             {/* Sign Up Button */}
             <div className="uk-margin-bottom">
               <button 
@@ -352,3 +414,5 @@ const Signup = () => {
 };
 
 export default Signup;
+
+

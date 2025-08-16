@@ -9,6 +9,7 @@ const My_Cars = () => {
   const { token, isAuthenticated, loading, user } = useAuth();
   const [cars, setCars] = useState([]);
   const [error, setError] = useState(null);
+
   const [fetchingCars, setFetchingCars] = useState(false);
   const navigate = useNavigate(); 
 
@@ -17,10 +18,12 @@ const My_Cars = () => {
       try {
         const token = localStorage.getItem('token');
         await axios.delete(`http://localhost:8080/api/cars/${carId}`, {
+
           headers: { 
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
+          
         });
         
         UIkit.notification({
@@ -372,7 +375,7 @@ const My_Cars = () => {
                             {car.color}
                           </p>
                         )}
-                      </div>
+                      </div> 
                       
                       {car.note && (
                         <p style={{ 
