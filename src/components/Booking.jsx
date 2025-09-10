@@ -216,7 +216,6 @@ const Booking = () => {
       setErrors((prev) => ({ ...prev, general: "Failed to load available slots" }));
     }
   };
-  
 
   // Form Handlers
   const handleInputChange = (field, value) => {
@@ -312,30 +311,19 @@ const Booking = () => {
     }
   };
 
-  const cardStyle = {
-    background: '#1e293b',
-    border: '1px solid #334155',
-    borderRadius: '12px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-    padding: '2rem',
-    margin: '1rem 0',
-  };
-
   const LoadingSkeleton = () => (
-    <div className="uk-card uk-card-body" style={cardStyle}>
-      <div style={{ height: '20px', background: '#374151', borderRadius: '4px', marginBottom: '20px' }}></div>
-      <div style={{ height: '40px', background: '#374151', borderRadius: '4px' }}></div>
+    <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 mb-4">
+      <div className="h-5 bg-gray-200 rounded w-1/4 mb-5"></div>
+      <div className="h-10 bg-gray-200 rounded"></div>
     </div>
   );
 
   if (initialLoading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0f0f23' }}>
-        <div className="uk-container uk-margin-large-top">
-          <div className="uk-text-center uk-margin-large-bottom">
-            <h1 className="uk-heading-medium" style={{ color: '#f1f5f9' }}>
-              Loading Booking Page...
-            </h1>
+      <div className="min-h-screen bg-gray-100">
+        <div className="container mx-auto pt-16">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900">Loading Booking Page...</h1>
           </div>
           <LoadingSkeleton />
           <LoadingSkeleton />
@@ -346,37 +334,20 @@ const Booking = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f0f23' }}>
-      <div className="uk-container uk-margin-large-top">
+    <div className="min-h-screen bg-gray-100 ">
+      <div className="container mx-auto pt-16 ">
         {/* Header */}
-        <div className="uk-text-center uk-margin-large-bottom">
-          <h1
-            className="uk-heading-medium"
-            style={{
-              color: '#f1f5f9',
-              background: 'linear-gradient(135deg, #60a5fa, #a78bfa)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            Book Your Car Wash Service
-          </h1>
-          <p style={{ color: '#94a3b8', fontSize: '18px' }}>
-            Select your car, car wash, service, date, and time
-          </p>
-          <Link
-            to="/Customer_dashboard"
-            className="uk-button uk-button-text"
-            style={{ color: '#3b82f6' }}
-          >
-            <span uk-icon="icon: chevron-left"></span> Back to Dashboard
+        <div className="text-center mb-12 mt-20 ">
+          <h1 className="text-4xl font-bold text-gray-900">Book Your Car Wash Service</h1>
+          <p className="text-lg text-gray-600 mt-2">Select your car, car wash, service, date, and time</p>
+          <Link to="/Customer_dashboard" className="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors">
+            <span uk-icon="icon: chevron-left" className="mr-1"></span> Back to Dashboard
           </Link>
         </div>
 
         {/* Error Messages */}
         {errors.general && (
-          <div className="uk-alert-danger uk-margin-bottom" uk-alert="true">
+          <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg mb-6">
             <p>{errors.general}</p>
           </div>
         )}
@@ -384,20 +355,21 @@ const Booking = () => {
         {/* Booking Form */}
         <form
           onSubmit={handleSubmit}
-          className="uk-form-stacked"
-          uk-scrollspy="cls: uk-animation-slide-bottom-small; target: .uk-card; delay: 200"
+          className="space-y-6"
+          uk-scrollspy="cls: uk-animation-slide-bottom-small; target: .card; delay: 200"
         >
           {/* Step 1: Car Selection */}
-          <div className="uk-card uk-card-body" style={cardStyle}>
-            <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>
-              <span uk-icon="icon: car; ratio: 1.2" style={{ color: '#3b82f6', marginRight: '10px' }}></span>
+          <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+              <span uk-icon="icon: car; ratio: 1.2" className="text-blue-600 mr-2"></span>
               1. Select Your Car
             </h3>
             <select
               value={formData.carId}
               onChange={(e) => handleInputChange('carId', e.target.value)}
-              className={`uk-select ${errors.carId ? 'uk-form-danger' : ''}`}
-              style={{ background: '#374151', border: '1px solid #4b5563', color: '#f1f5f9', borderRadius: '8px' }}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.carId ? 'border-red-500' : 'border-gray-300'
+              } bg-white text-gray-900`}
             >
               <option value="">Choose a car...</option>
               {userCars.map((car) => (
@@ -406,11 +378,11 @@ const Booking = () => {
                 </option>
               ))}
             </select>
-            {errors.carId && <div className="uk-text-danger uk-margin-small-top">{errors.carId}</div>}
+            {errors.carId && <p className="text-red-600 text-sm mt-2">{errors.carId}</p>}
             {userCars.length === 0 && (
-              <p style={{ color: '#94a3b8', marginTop: '10px' }}>
+              <p className="text-gray-600 text-sm mt-2">
                 No cars found.{' '}
-                <Link to="/Car_formPage" style={{ color: '#3b82f6' }}>
+                <Link to="/Car_formPage" className="text-blue-600 hover:text-blue-700">
                   Add a car
                 </Link>{' '}
                 to your account first.
@@ -419,16 +391,17 @@ const Booking = () => {
           </div>
 
           {/* Step 2: Car Wash Selection */}
-          <div className="uk-card uk-card-body" style={cardStyle}>
-            <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>
-              <span uk-icon="icon: location; ratio: 1.2" style={{ color: '#10b981', marginRight: '10px' }}></span>
+          <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+              <span uk-icon="icon: location; ratio: 1.2" className="text-green-600 mr-2"></span>
               2. Select Car Wash
             </h3>
             <select
               value={formData.carwashId}
               onChange={(e) => handleInputChange('carwashId', e.target.value)}
-              className={`uk-select ${errors.carwashId ? 'uk-form-danger' : ''}`}
-              style={{ background: '#374151', border: '1px solid #4b5563', color: '#f1f5f9', borderRadius: '8px' }}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.carwashId ? 'border-red-500' : 'border-gray-300'
+              } bg-white text-gray-900`}
             >
               <option value="">Choose a car wash...</option>
               {carwashes.map((carwash) => (
@@ -437,20 +410,20 @@ const Booking = () => {
                 </option>
               ))}
             </select>
-            {errors.carwashId && <div className="uk-text-danger uk-margin-small-top">{errors.carwashId}</div>}
+            {errors.carwashId && <p className="text-red-600 text-sm mt-2">{errors.carwashId}</p>}
             {selectedCarwash && (
-              <div className="uk-margin-top uk-padding-small" style={{ background: '#374151', borderRadius: '8px', border: '1px solid #4b5563' }}>
-                <h4 style={{ color: '#f1f5f9', margin: '0 0 10px 0' }}>{selectedCarwash.name}</h4>
-                <p style={{ color: '#94a3b8', margin: '0 0 10px 0' }}>{selectedCarwash.description}</p>
-                <p style={{ color: '#94a3b8', margin: '0 0 10px 0' }}>
-                  <span uk-icon="icon: location"></span> {selectedCarwash.address}
+              <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <h4 className="text-lg font-medium text-gray-900 mb-2">{selectedCarwash.name}</h4>
+                <p className="text-gray-600 mb-2">{selectedCarwash.description}</p>
+                <p className="text-gray-600 mb-2 flex items-center">
+                  <span uk-icon="icon: location" className="mr-1"></span> {selectedCarwash.address}
                 </p>
-                <p style={{ color: '#94a3b8', margin: '0 0 10px 0' }}>
-                  <span uk-icon="icon: star"></span> Rating: {selectedCarwash.rating || 'N/A'}
+                <p className="text-gray-600 mb-2 flex items-center">
+                  <span uk-icon="icon: star" className="mr-1"></span> Rating: {selectedCarwash.rating || 'N/A'}
                 </p>
                 {formData.bookingDate && (
-                  <p style={{ color: '#94a3b8', margin: '0' }}>
-                    <span uk-icon="icon: clock"></span> Hours:{' '}
+                  <p className="text-gray-600 flex items-center">
+                    <span uk-icon="icon: clock" className="mr-1"></span> Hours:{' '}
                     {(() => {
                       const openHours = getOpenHoursForDate(selectedCarwash, formData.bookingDate);
                       return openHours ? `${openHours.start} - ${openHours.end}` : 'Closed';
@@ -462,108 +435,85 @@ const Booking = () => {
           </div>
 
           {/* Step 3: Service Selection */}
-          <div className="uk-card uk-card-body" style={cardStyle}>
-            <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>
-              <span uk-icon="icon: settings; ratio: 1.2" style={{ color: '#f59e0b', marginRight: '10px' }}></span>
+          <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+              <span uk-icon="icon: settings; ratio: 1.2" className="text-amber-600 mr-2"></span>
               3. Select Service
             </h3>
-
             <select
               value={formData.serviceId}
               onChange={(e) => handleInputChange('serviceId', e.target.value)}
-              className={`uk-select ${errors.serviceId ? 'uk-form-danger' : ''}`}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                errors.serviceId ? 'border-red-500' : 'border-gray-300'
+              } bg-white text-gray-900 ${!formData.carwashId ? 'opacity-50 cursor-not-allowed' : ''}`}
               disabled={!formData.carwashId}
-              style={{ background: '#374151', border: '1px solid #4b5563', color: '#f1f5f9', borderRadius: '8px' }}
             >
               <option value="">Choose a service...</option>
-
               {selectedCarwash?.services?.length > 0 ? (
-              selectedCarwash.services.map((service) => (
-                <option key={service.name} value={service.name}>
-                  {service.name} - ₦{service.price} ({service.duration} mins)
-                </option>
-              ))
-            ) : (
-              <option disabled>No services available</option>
-            )}
-
+                selectedCarwash.services.map((service) => (
+                  <option key={service.name} value={service.name}>
+                    {service.name} - ₦{service.price} ({service.duration} mins)
+                  </option>
+                ))
+              ) : (
+                <option disabled>No services available</option>
+              )}
             </select>
-
-            {errors.serviceId && <div className="uk-text-danger uk-margin-small-top">{errors.serviceId}</div>}
+            {errors.serviceId && <p className="text-red-600 text-sm mt-2">{errors.serviceId}</p>}
             {selectedService && (
-              <div className="uk-margin-top uk-padding-small" style={{ background: '#374151', borderRadius: '8px', border: '1px solid #4b5563' }}>
-                <p style={{ color: '#94a3b8', margin: '0 0 10px 0' }}>{selectedService.description}</p>
-                <p style={{ color: '#94a3b8', margin: '0' }}>
-                  <span uk-icon="icon: tag"></span> Price: ₦{selectedService.price} | Duration: {selectedService.duration} mins
+              <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-gray-600 mb-2">{selectedService.description}</p>
+                <p className="text-gray-600 flex items-center">
+                  <span uk-icon="icon: tag" className="mr-1"></span> Price: ₦{selectedService.price} | Duration: {selectedService.duration} mins
                 </p>
               </div>
             )}
           </div>
-           
 
           {/* Step 4: Date & Time Selection */}
-          <div className="uk-card uk-card-body" style={cardStyle}>
-            <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>
-              <span uk-icon="icon: calendar; ratio: 1.2" style={{ color: '#ec4899', marginRight: '10px' }}></span>
+          <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+              <span uk-icon="icon: calendar; ratio: 1.2" className="text-pink-600 mr-2"></span>
               4. Select Date & Time
             </h3>
-            <div className="uk-grid-small uk-child-width-1-2@m" uk-grid="true">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="uk-form-label" style={{ color: '#f1f5f9' }}>
-                  Date
-                </label>
+                <label className="block text-gray-900 font-medium mb-2">Date</label>
                 <input
                   type="date"
                   value={formData.bookingDate}
                   onChange={(e) => handleInputChange('bookingDate', e.target.value)}
                   min={getMinDate()}
-                  className={`uk-input ${errors.bookingDate ? 'uk-form-danger' : ''}`}
-                  style={{ background: '#374151', border: '1px solid #4b5563', color: '#f1f5f9', borderRadius: '8px' }}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    errors.bookingDate ? 'border-red-500' : 'border-gray-300'
+                  } bg-white text-gray-900`}
                 />
-                {errors.bookingDate && <div className="uk-text-danger uk-margin-small-top">{errors.bookingDate}</div>}
+                {errors.bookingDate && <p className="text-red-600 text-sm mt-2">{errors.bookingDate}</p>}
               </div>
               <div>
-                <label className="uk-form-label" style={{ color: '#f1f5f9' }}>
-                  Time
-                </label>
-                <div className="uk-grid-small uk-child-width-1-3@s uk-margin-top" uk-grid="true">
+                <label className="block text-gray-900 font-medium mb-2">Time</label>
+                <div className="grid grid-cols-3 gap-2 mt-2">
                   {availableSlots.map((slot) => (
-                    <div key={slot.time}>
-                      <button
-                        type="button"
-                        disabled={!slot.available}
-                        onClick={() => handleInputChange('bookingTime', slot.time)}
-                        className="uk-button uk-button-small"
-                        style={{
-                          background: slot.time === formData.bookingTime ? '#3b82f6' : slot.available ? '#374151' : '#6b7280',
-                          color: '#f1f5f9',
-                          border: '1px solid #4b5563',
-                          borderRadius: '8px',
-                          width: '100%',
-                          padding: '10px',
-                          transition: 'all 0.3s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          if (slot.available) {
-                            e.currentTarget.style.background = '#3b82f6';
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (slot.available) {
-                            e.currentTarget.style.background = slot.time === formData.bookingTime ? '#3b82f6' : '#374151';
-                            e.currentTarget.style.transform = 'translateY(0)';
-                          }
-                        }}
-                      >
-                        {slot.time} {slot.available ? '' : '(Booked)'}
-                      </button>
-                    </div>
+                    <button
+                      key={slot.time}
+                      type="button"
+                      disabled={!slot.available}
+                      onClick={() => handleInputChange('bookingTime', slot.time)}
+                      className={`p-3 border rounded-lg text-sm transition-all ${
+                        slot.time === formData.bookingTime
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : slot.available
+                          ? 'bg-white border-gray-300 text-gray-900 hover:bg-blue-50 hover:border-blue-500'
+                          : 'bg-gray-200 border-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {slot.time} {slot.available ? '' : '(Booked)'}
+                    </button>
                   ))}
                 </div>
-                {errors.bookingTime && <div className="uk-text-danger uk-margin-small-top">{errors.bookingTime}</div>}
+                {errors.bookingTime && <p className="text-red-600 text-sm mt-2">{errors.bookingTime}</p>}
                 {formData.bookingDate && availableSlots.length === 0 && !errors.bookingDate && (
-                  <p style={{ color: '#94a3b8', marginTop: '10px' }}>
+                  <p className="text-gray-600 text-sm mt-2">
                     No available slots for this date. Please select another date or car wash.
                   </p>
                 )}
@@ -572,29 +522,29 @@ const Booking = () => {
           </div>
 
           {/* Step 5: Booking Type */}
-          <div className="uk-card uk-card-body" style={cardStyle}>
-            <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>
-              <span uk-icon="icon: settings; ratio: 1.2" style={{ color: '#8b5cf6', marginRight: '10px' }}></span>
+          <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+              <span uk-icon="icon: settings; ratio: 1.2" className="text-purple-600 mr-2"></span>
               5. Booking Type
             </h3>
-            <div>
-              <label className="uk-margin-right" style={{ color: '#f1f5f9', marginRight: '30px' }}>
+            <div className="flex space-x-6">
+              <label className="flex items-center text-gray-900">
                 <input
                   type="radio"
                   value="slot_booking"
                   checked={formData.bookingType === 'slot_booking'}
                   onChange={(e) => handleBookingTypeChange(e.target.value)}
-                  className="uk-radio uk-margin-small-right"
+                  className="mr-2 accent-blue-600"
                 />
                 Slot Booking (Visit car wash)
               </label>
-              <label style={{ color: '#f1f5f9' }}>
+              <label className="flex items-center text-gray-900">
                 <input
                   type="radio"
                   value="home_service"
                   checked={formData.bookingType === 'home_service'}
                   onChange={(e) => handleBookingTypeChange(e.target.value)}
-                  className="uk-radio uk-margin-small-right"
+                  className="mr-2 accent-blue-600"
                   disabled={!selectedCarwash?.home_service}
                 />
                 Home Service (They come to you)
@@ -604,9 +554,9 @@ const Booking = () => {
 
           {/* Step 6: Location (for home service) */}
           {formData.bookingType === 'home_service' && (
-            <div className="uk-card uk-card-body" style={cardStyle}>
-              <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>
-                <span uk-icon="icon: home; ratio: 1.2" style={{ color: '#ec4899', marginRight: '10px' }}></span>
+            <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+                <span uk-icon="icon: home; ratio: 1.2" className="text-pink-600 mr-2"></span>
                 6. Your Location
               </h3>
               <input
@@ -614,76 +564,55 @@ const Booking = () => {
                 placeholder="Enter your full address"
                 value={formData.userLocation}
                 onChange={(e) => handleInputChange('userLocation', e.target.value)}
-                className={`uk-input uk-margin-small-bottom ${errors.userLocation ? 'uk-form-danger' : ''}`}
-                style={{ background: '#374151', border: '1px solid #4b5563', color: '#f1f5f9', borderRadius: '8px' }}
+                className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-3 ${
+                  errors.userLocation ? 'border-red-500' : 'border-gray-300'
+                } bg-white text-gray-900`}
               />
               <textarea
                 placeholder="Additional directions or landmark notes (e.g., 'Blue gate, next to pharmacy')"
                 value={formData.addressNote}
                 onChange={(e) => handleInputChange('addressNote', e.target.value)}
-                className="uk-textarea"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 bg-white text-gray-900"
                 rows="3"
-                style={{ background: '#374151', border: '1px solid #4b5563', color: '#f1f5f9', borderRadius: '8px' }}
               ></textarea>
-              {errors.userLocation && <div className="uk-text-danger uk-margin-small-top">{errors.userLocation}</div>}
+              {errors.userLocation && <p className="text-red-600 text-sm mt-2">{errors.userLocation}</p>}
             </div>
           )}
 
           {/* Step 7: Additional Notes */}
-          <div className="uk-card uk-card-body" style={cardStyle}>
-            <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>
-              <span uk-icon="icon: commenting; ratio: 1.2" style={{ color: '#06b6d4', marginRight: '10px' }}></span>
+          <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-5 flex items-center">
+              <span uk-icon="icon: commenting; ratio: 1.2" className="text-cyan-600 mr-2"></span>
               7. Additional Notes
             </h3>
             <textarea
               placeholder="Any special requests or instructions (e.g., 'Please clean interior thoroughly')"
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
-              className="uk-textarea"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 bg-white text-gray-900"
               rows="4"
-              style={{ background: '#374151', border: '1px solid #4b5563', color: '#f1f5f9', borderRadius: '8px' }}
             ></textarea>
           </div>
 
           {/* Submit Button */}
-          <div className="uk-text-center uk-margin-large-top">
+          <div className="text-center mt-12">
             <button
               type="submit"
               disabled={loading}
-              className="uk-button uk-button-large"
-              style={{
-                background: loading ? '#6b7280' : 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-                border: 'none',
-                borderRadius: '30px',
-                padding: '15px 50px',
-                fontWeight: '600',
-                color: 'white',
-                fontSize: '18px',
-                boxShadow: '0 8px 25px rgba(59, 130, 246, 0.3)',
-                transition: 'all 0.3s ease',
-                cursor: loading ? 'not-allowed' : 'pointer',
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 12px 30px rgba(59, 130, 246, 0.4)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.3)';
-                }
-              }}
+              className={`inline-flex items-center px-8 py-4 text-lg font-semibold text-white rounded-full transition-all ${
+                loading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5'
+              } shadow-md`}
             >
               {loading ? (
                 <>
-                  <span uk-spinner="ratio: 0.8" style={{ marginRight: '10px' }}></span>
+                  <span uk-spinner="ratio: 0.8" className="mr-2"></span>
                   Creating Booking...
                 </>
               ) : (
                 <>
-                  <span uk-icon="icon: check" style={{ marginRight: '10px' }}></span>
+                  <span uk-icon="icon: check" className="mr-2"></span>
                   Create Booking
                 </>
               )}

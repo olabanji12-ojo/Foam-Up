@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import UIkit from 'uikit';
-import { baseURL } from '../utils/environments';;
+import { baseURL } from '../utils/environments';
 
 const ProfileEdit = () => {
   const { user: authUser, token, loading: authLoading } = useAuth();
@@ -135,10 +135,10 @@ const ProfileEdit = () => {
 
   if (authLoading || loading) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="uk-card uk-card-body uk-text-center" style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
-          <h3 style={{ color: '#f1f5f9' }}>Loading profile...</h3>
-          <span uk-spinner="ratio: 1.5" style={{ color: '#10b981' }}></span>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 text-center">
+          <h3 className="text-xl font-semibold text-gray-900">Loading profile...</h3>
+          <span uk-spinner="ratio: 1.5" className="text-blue-600"></span>
         </div>
       </div>
     );
@@ -146,18 +146,13 @@ const ProfileEdit = () => {
 
   if (error) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="uk-card uk-card-body uk-text-center" style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
-          <h3 style={{ color: '#f1f5f9' }}>Error Loading Profile</h3>
-          <p style={{ color: '#ef4444' }}>{error}</p>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 text-center">
+          <h3 className="text-xl font-semibold text-gray-900">Error Loading Profile</h3>
+          <p className="text-red-600">{error}</p>
           <button 
-            className="uk-button uk-button-default"
+            className="mt-4 px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
             onClick={() => window.location.reload()}
-            style={{ 
-              marginTop: '20px',
-              borderColor: '#64748b',
-              color: '#94a3b8'
-            }}
           >
             Try Again
           </button>
@@ -167,121 +162,61 @@ const ProfileEdit = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23' }}>
+    <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
-      <div className="uk-section uk-section-primary" 
-           style={{ 
-             background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-             padding: '60px 0'
-           }}>
-        <div className="uk-container">
-          <h1 className="uk-heading-medium uk-text-white uk-text-center">
-            Edit Profile
-          </h1>
+      {/* <div className="bg-white shadow-md py-12">
+        <div className="container mx-auto">
+          <h1 className="text-4xl font-bold text-gray-900 text-center">Edit Profile</h1>
         </div>
-      </div>
+      </div> */}
 
       {/* Profile Edit Form */}
-      <div className="uk-section" style={{ backgroundColor: '#0f0f23' }}>
-        <div className="uk-container uk-container-small">
-          <div className="uk-card uk-card-default uk-card-body" 
-               style={{ 
-                 backgroundColor: '#1e293b',
-                 borderRadius: '16px',
-                 border: '1px solid #334155'
-               }}>
-            
+      <div className="py-12">
+        <div className="container mx-auto max-w-2xl" uk-scrollspy="cls: uk-animation-slide-bottom-small; target: .card; delay: 200">
+          <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 mt-20">
             {/* Profile Photo Section */}
-            <div className="uk-margin-large-bottom uk-text-center">
-              <h3 style={{ color: '#f1f5f9', marginBottom: '20px' }}>Profile Photo</h3>
-              
-              {/* Current/Preview Image */}
-              <div className="uk-margin-bottom">
-                <div className="uk-border-circle uk-display-inline-block" 
-                     style={{
-                       width: '150px',
-                       height: '150px',
-                       overflow: 'hidden',
-                       position: 'relative',
-                       border: '3px solid #64748b'
-                     }}>
+            <div className="mb-8 text-center">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Profile Photo</h3>
+              <div className="mb-4">
+                <div className="relative w-36 h-36 mx-auto rounded-full overflow-hidden border-2 border-gray-200">
                   {previewImage ? (
                     <img 
                       src={previewImage} 
                       alt="Profile preview"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center'
-                      }}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div style={{
-                      width: '100%',
-                      height: '100%',
-                      background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <span uk-icon="icon: user; ratio: 3" style={{ color: 'white' }}></span>
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500">
+                      <span uk-icon="icon: user; ratio: 3" className="text-white"></span>
                     </div>
                   )}
                 </div>
               </div>
-
-              {/* File Upload Input */}
-              <div className="uk-margin-bottom">
-                <div className="uk-form-controls uk-text-center">
-                  <label style={{ 
-                    display: 'inline-block',
-                    cursor: 'pointer',
-                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                    color: 'white',
-                    padding: '10px 20px',
-                    borderRadius: '20px',
-                    border: 'none',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                  }}>
-                    <span uk-icon="icon: camera; ratio: 0.8" className="uk-margin-small-right"></span>
-                    Choose New Photo
-                    <input 
-                      type="file" 
-                      name="profile_photo"
-                      onChange={handleFileChange}
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                    />
-                  </label>
-                </div>
+              <div className="mb-4">
+                <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-all">
+                  <span uk-icon="icon: camera; ratio: 0.8" className="mr-2"></span>
+                  Choose New Photo
+                  <input 
+                    type="file" 
+                    name="profile_photo"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </label>
               </div>
-
-              {/* Remove/Reset Button */}
               {(profilePhoto || previewImage !== profile.profile_photo) && (
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="uk-button uk-button-default uk-button-small"
-                  style={{
-                    borderColor: '#ef4444',
-                    color: '#ef4444',
-                    borderRadius: '15px'
-                  }}
+                  className="px-3 py-1 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition-colors"
                 >
-                  <span uk-icon="icon: close; ratio: 0.7" className="uk-margin-small-right"></span>
+                  <span uk-icon="icon: close; ratio: 0.7" className="mr-1"></span>
                   Reset Photo
                 </button>
               )}
-              
-              {/* File Info */}
               {profilePhoto && (
-                <div style={{ 
-                  marginTop: '10px',
-                  fontSize: '12px',
-                  color: '#94a3b8'
-                }}>
+                <div className="mt-2 text-sm text-gray-600">
                   Selected: {profilePhoto.name} ({(profilePhoto.size / 1024 / 1024).toFixed(2)} MB)
                 </div>
               )}
@@ -289,101 +224,67 @@ const ProfileEdit = () => {
 
             {/* Form Fields */}
             <form onSubmit={handleSubmit}>
-              <fieldset className="uk-fieldset">
-                <div className="uk-margin">
-                  <label className="uk-form-label" style={{ color: '#f1f5f9' }}>Full Name</label>
-                  <div className="uk-form-controls">
-                    <input 
-                      className="uk-input" 
-                      type="text" 
-                      name="name"
-                      value={profile.name || ''}
-                      onChange={handleChange}
-                      style={{ 
-                        backgroundColor: '#334155', 
-                        color: '#f1f5f9',
-                        borderColor: '#64748b'
-                      }}
-                      required
-                    />
-                  </div>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-gray-900 font-medium mb-2">Full Name</label>
+                  <input 
+                    type="text" 
+                    name="name"
+                    value={profile.name || ''}
+                    onChange={handleChange}
+                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 bg-white text-gray-900"
+                    required
+                  />
                 </div>
-
-                <div className="uk-margin">
-                  <label className="uk-form-label" style={{ color: '#f1f5f9' }}>Email</label>
-                  <div className="uk-form-controls">
-                    <input 
-                      className="uk-input" 
-                      type="email" 
-                      name="email"
-                      value={profile.email || ''}
-                      onChange={handleChange}
-                      style={{ 
-                        backgroundColor: '#334155',
-                        color: '#f1f5f9',
-                        borderColor: '#64748b'
-                      }}
-                      required
-                    />
-                  </div>
+                <div>
+                  <label className="block text-gray-900 font-medium mb-2">Email</label>
+                  <input 
+                    type="email" 
+                    name="email"
+                    value={profile.email || ''}
+                    onChange={handleChange}
+                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 bg-white text-gray-900"
+                    required
+                  />
                 </div>
-
-                <div className="uk-margin">
-                  <label className="uk-form-label" style={{ color: '#f1f5f9' }}>Phone Number</label>
-                  <div className="uk-form-controls">
-                    <input 
-                      className="uk-input" 
-                      type="tel" 
-                      name="phone"
-                      value={profile.phone || ''}
-                      onChange={handleChange}
-                      style={{ 
-                        backgroundColor: '#334155',
-                        color: '#f1f5f9',
-                        borderColor: '#64748b'
-                      }}
-                    />
-                  </div>
+                <div>
+                  <label className="block text-gray-900 font-medium mb-2">Phone Number</label>
+                  <input 
+                    type="tel" 
+                    name="phone"
+                    value={profile.phone || ''}
+                    onChange={handleChange}
+                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 bg-white text-gray-900"
+                  />
                 </div>
-
-                <div className="uk-margin-top">
+                <div className="flex space-x-4">
                   <button
                     type="submit"
-                    className="uk-button uk-button-primary"
                     disabled={isSubmitting}
-                    style={{
-                      background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-                      borderRadius: '20px',
-                      marginRight: '10px'
-                    }}>
-
+                    className={`inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:shadow-md transition-all ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : ''}`}
+                  >
                     {isSubmitting ? (
                       <>
-                        <span uk-spinner="ratio: 0.6"></span> Saving...
+                        <span uk-spinner="ratio: 0.6" className="mr-2"></span>
+                        Saving...
                       </>
                     ) : (
                       <>
-                        <span uk-icon="icon: check; ratio: 0.8" className="uk-margin-small-right"></span>
+                        <span uk-icon="icon: check; ratio: 0.8" className="mr-2"></span>
                         Save Changes
                       </>
                     )}
                   </button>
-
                   <button
                     type="button"
                     onClick={() => navigate(`/profile/${id}`)}
-                    className="uk-button uk-button-default"
-                    style={{
-                      borderRadius: '20px',
-                      borderColor: '#64748b',
-                      color: '#94a3b8'
-                    }}
+                    className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                   >
-                    <span uk-icon="icon: arrow-left; ratio: 0.8" className="uk-margin-small-right"></span>
+                    <span uk-icon="icon: arrow-left; ratio: 0.8" className="mr-2"></span>
                     Cancel
                   </button>
                 </div>
-              </fieldset>
+              </div>
             </form>
           </div>
         </div>
@@ -393,7 +294,3 @@ const ProfileEdit = () => {
 };
 
 export default ProfileEdit;
-
-
-
-

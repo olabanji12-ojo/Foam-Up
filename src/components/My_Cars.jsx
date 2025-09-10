@@ -1,80 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import UIkit from 'uikit';
-import { useNavigate } from 'react-router-dom';
-
-
 import { baseURL } from '../utils/environments';
 
 const My_Cars = () => {
   const { token, isAuthenticated, loading, user } = useAuth();
   const [cars, setCars] = useState([]);
   const [error, setError] = useState(null);
-
   const [fetchingCars, setFetchingCars] = useState(false);
-  const navigate = useNavigate(); 
+  const [deletingId, setDeletingId] = useState(null);
+  const navigate = useNavigate();
 
-  const handleDeleteCar = async (carId) => {
-    if (window.confirm('Are you sure you want to delete this vehicle?')) {
-      try {
-        const token = localStorage.getItem('token');
-        await axios.delete(`${baseURL}/cars/${carId}`, {
-
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-
-        });
-        
-        UIkit.notification({
-          message: 'Vehicle deleted successfully!',
-          status: 'success',
-          pos: 'top-center'
-        });
-        
-        // Refresh the car list or navigate away
-        navigate('/Customer_dashboard');
-      } catch (err) {
-        UIkit.notification({
-          message: err.response?.data?.error || 'Failed to delete vehicle',
-          status: 'danger',
-          pos: 'top-center'
-        });
-        console.error(err);
-      }
-    } 
-  };
-  
-  // Add CSS animations for floating elements
   useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(180deg); }
-      }
-      @keyframes pulse {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 0.8; }
-      }
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    
-
     const fetchMyCars = async () => {
       if (loading || !isAuthenticated || !token) {
         console.log('Skipping API call: Auth not ready');
@@ -118,30 +56,49 @@ const My_Cars = () => {
     };
 
     fetchMyCars();
-
-    return () => {
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
-      }
-    };
   }, [token, isAuthenticated, loading]);
+
+  const handleDeleteCar = async (carId) => {
+    if (!window.confirm('Are you sure you want to delete this vehicle?')) return;
+    
+    setDeletingId(carId);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${baseURL}/cars/${carId}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      });
+      
+      // Remove the car from state
+      setCars(cars.filter(car => (car.id || car._id) !== carId));
+      
+      // Show success message
+      // You could implement a toast notification system here
+      alert('Vehicle deleted successfully!');
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || 'Failed to delete vehicle');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (error) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23', color: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="uk-card uk-card-default uk-card-body uk-text-center" style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155', maxWidth: '500px', margin: '20px' }}>
-          <span uk-icon="icon: warning; ratio: 2" style={{ color: '#ef4444', display: 'block', marginBottom: '15px' }}></span>
-          <h3 style={{ color: '#f1f5f9' }}>Error Loading Vehicles</h3>
-          <p style={{ color: '#94a3b8', marginBottom: '20px' }}>{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="uk-button uk-button-primary"
-            style={{
-              background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-              border: 'none',
-              borderRadius: '20px',
-              padding: '0 25px',
-            }}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-24 pb-16 flex items-center justify-center">
+        <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 text-center max-w-md mx-4">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">Error Loading Vehicles</h3>
+          <p className="text-slate-600 mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-colors duration-300"
           >
             Try Again
           </button>
@@ -152,344 +109,181 @@ const My_Cars = () => {
 
   if (loading || fetchingCars) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23', color: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="uk-card uk-card-default uk-card-body uk-text-center" style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
-          <h3 style={{ color: '#f1f5f9' }}>Loading your vehicles...</h3>
-          <span uk-spinner="ratio: 1.5" style={{ color: '#10b981' }}></span>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-24 pb-16 flex items-center justify-center">
+        <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <h3 className="text-lg font-medium text-slate-800">Loading your vehicles...</h3>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23' }}>
-      {/* Hero Section */}
-      <div
-        className="uk-section uk-section-primary"
-        style={{
-          background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-          padding: '60px 0',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            top: '10%',
-            right: '15%',
-            width: '100px',
-            height: '100px',
-            background: 'rgba(59, 130, 246, 0.1)',
-            borderRadius: '50%',
-            animation: 'float 6s ease-in-out infinite',
-          }}
-        ></div>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '20%',
-            left: '10%',
-            width: '150px',
-            height: '150px',
-            background: 'rgba(139, 92, 246, 0.1)',
-            borderRadius: '50%',
-            animation: 'float 8s ease-in-out infinite reverse',
-          }}
-        ></div>
-        <div className="uk-container" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="uk-text-center">
-            <div 
-              className="uk-border-circle uk-flex uk-flex-center uk-flex-middle uk-margin-bottom" 
-              style={{ 
-                width: '100px', 
-                height: '100px', 
-                background: 'linear-gradient(135deg, #60a5fa, #a78bfa)',
-                margin: '0 auto 30px'
-              }}
-            >
-              <span uk-icon="icon: car; ratio: 2.5" style={{ color: 'white' }}></span>
-            </div>
-            <h1
-              className="uk-heading-medium uk-text-white uk-margin-remove-bottom"
-              style={{
-                textShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                background: 'linear-gradient(135deg, #60a5fa, #a78bfa)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              My Vehicles
-            </h1>
-            <p
-              className="uk-text-large uk-text-white uk-margin-small-top"
-              style={{ opacity: 0.8, textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}
-            >
-              Manage your registered cars
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-24 pb-16">
+      {/* Header Section */}
+      <div className="container mx-auto px-4 mb-12">
+        <div className="text-center">
+          <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
+          
+          <h1 className="text-4xl font-bold text-slate-800 mb-3">
+            My Vehicles
+          </h1>
+          <p className="text-lg text-slate-600">
+            Manage your registered cars and their details
+          </p>
         </div>
       </div>
 
-      {/* Cars List */}
-      <div className="uk-section" style={{ backgroundColor: '#0f0f23' }}>
-        <div className="uk-container">
-          
-          {/* Add Car Button - Always visible at top */}
-          <div className="uk-text-center uk-margin-medium-bottom">
+      {/* Content Section */}
+      <div className="container mx-auto px-4">
+        {/* Add Car Button */}
+        <div className="text-center mb-10">
+          <Link
+            to="/Car_formPage"
+            className="inline-flex items-center px-6 py-3.5 rounded-2xl font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add New Vehicle
+          </Link>
+        </div>
+
+        {cars.length === 0 ? (
+          <div className="bg-white rounded-3xl p-12 shadow-lg border border-slate-100 text-center max-w-2xl mx-auto">
+            <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-semibold text-slate-800 mb-3">No Vehicles Found</h3>
+            <p className="text-slate-600 mb-8">
+              Start by adding your first vehicle to get started with FoamUP!
+            </p>
             <Link
               to="/Car_formPage"
-              className="uk-button uk-button-large"
-              style={{
-                background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-                border: 'none',
-                borderRadius: '30px',
-                padding: '0 35px',
-                fontWeight: '600',
-                color: 'white',
-                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
-                transition: 'all 0.3s ease',
-                textDecoration: 'none',
-                display: 'inline-block'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.3)';
-              }}
+              className="px-6 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-colors duration-300"
             >
-              <span uk-icon="icon: plus-circle; ratio: 0.8" style={{ marginRight: '8px' }}></span>
-              Add New Vehicle
+              Add Your First Vehicle
             </Link>
           </div>
-
-          {cars.length === 0 ? (
-            <div className="uk-card uk-card-default uk-card-body uk-text-center" 
-                 style={{ 
-                   backgroundColor: '#1e293b', 
-                   borderRadius: '12px', 
-                   border: '1px solid #334155',
-                   animation: 'slideUp 0.6s ease-out'
-                 }}>
-              <div 
-                className="uk-border-circle uk-flex uk-flex-center uk-flex-middle uk-margin-bottom" 
-                style={{ 
-                  width: '80px', 
-                  height: '80px', 
-                  background: 'linear-gradient(135deg, #64748b, #475569)',
-                  margin: '0 auto 20px'
-                }}
-              >
-                <span uk-icon="icon: car; ratio: 2" style={{ color: 'white' }}></span>
-              </div>
-              <h3 style={{ color: '#f1f5f9' }}>No Vehicles Found</h3>
-              <p style={{ color: '#94a3b8' }}>Start by adding your first vehicle to get started with FoamUP!</p>
-            </div>
-          ) : (
-            <>
-              <h2 className="uk-heading-line uk-text-center uk-margin-medium-bottom" style={{ color: '#f1f5f9' }}>
-                <span>Your Vehicles ({cars.length})</span>
-              </h2>
-              <div className="uk-grid-match uk-child-width-1-3@l uk-child-width-1-2@m uk-child-width-1-1@s uk-margin-medium-top" uk-grid="true">
-                {cars.map((car, index) => (
-                  <div key={car.id || car._id || index}>
-                    <div
-                      className="uk-card uk-card-hover uk-card-body uk-text-center"
-                      style={{
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
-                        borderRadius: '16px',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                        transition: 'all 0.4s ease',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        animation: `slideUp 0.6s ease-out ${index * 0.1}s both`
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-8px)';
-                        e.currentTarget.style.boxShadow = '0 20px 40px rgba(245, 158, 11, 0.2)';
-                        e.currentTarget.style.borderColor = '#f59e0b';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3)';
-                        e.currentTarget.style.borderColor = '#334155';
-                      }}
-                    >
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(217, 119, 6, 0.05))',
-                          pointerEvents: 'none',
-                        }}
-                      ></div>
-                      
-                      {/* Default Badge */}
-                      {car.isDefault && (
-                        <div style={{
-                          position: 'absolute',
-                          top: '15px',
-                          right: '15px',
-                          background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-                          color: 'white',
-                          padding: '4px 12px',
-                          borderRadius: '12px',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          zIndex: 3
-                        }}>
-                          DEFAULT
-                        </div>
-                      )}
-                      
-                      <div
-                        className="uk-border-circle uk-flex uk-flex-center uk-flex-middle uk-margin-bottom"
-                        style={{
-                          width: '80px',
-                          height: '80px',
-                          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                          margin: '0 auto 20px',
-                          position: 'relative',
-                          zIndex: 2,
-                        }}
-                      >
-                        <span uk-icon="icon: car; ratio: 2" style={{ color: 'white' }}></span>
-                      </div>
-                      
-                      <h3 className="uk-card-title uk-margin-remove-top" style={{ color: '#f1f5f9', position: 'relative', zIndex: 2 }}>
-                        {car.model || 'Unknown Model'}
-                      </h3>
-                      
-                      <div style={{ color: '#94a3b8', position: 'relative', zIndex: 2, marginBottom: '15px' }}>
-                        <p style={{ margin: '5px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <span uk-icon="icon: tag; ratio: 0.7" style={{ marginRight: '8px', color: '#64748b' }}></span>
-                          {car.plate || 'No Plate'}
-                        </p>
-                        {car.color && (
-                          <p style={{ margin: '5px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <span uk-icon="icon: paint-bucket; ratio: 0.7" style={{ marginRight: '8px', color: '#64748b' }}></span>
-                            {car.color}
-                          </p>
-                        )}
-                      </div> 
-                      
-                      {car.note && (
-                        <p style={{ 
-                          color: '#94a3b8', 
-                          position: 'relative', 
-                          zIndex: 2, 
-                          fontStyle: 'italic',
-                          fontSize: '14px',
-                          marginBottom: '20px',
-                          padding: '10px',
-                          backgroundColor: 'rgba(51, 65, 85, 0.3)',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(71, 85, 105, 0.3)'
-                        }}>
-                          "{car.note}"
-                        </p>
-                      )}
-                      
-                      <div className="uk-flex uk-flex-center uk-child-width-auto" uk-grid="true">
-                      <div>
-                        <Link
-                          to={`/Car_formPage/${car.id || car._id}`}
-                          className="uk-button uk-button-small uk-margin-small-right"
-                          style={{
-                            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                            border: 'none',
-                            borderRadius: '20px',
-                            padding: '0 20px',
-                            fontWeight: '600',
-                            color: 'white',
-                            boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)',
-                            transition: 'all 0.3s ease',
-                            textDecoration: 'none',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(245, 158, 11, 0.4)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.3)';
-                          }}
-                        >
-                          <span uk-icon="icon: pencil; ratio: 0.7" style={{ marginRight: '5px' }}></span>
-                          Edit
-                        </Link>
-                      </div>
-                      
-                      {/* Delete Button */}
-                      <div>
-                        <button
-                          onClick={() => handleDeleteCar(car.id || car._id)}
-                          className="uk-button uk-button-small"
-                          style={{
-                            background: 'transparent',
-                            border: '2px solid #ef4444',
-                            color: '#ef4444',
-                            borderRadius: '20px',
-                            padding: '0 15px',
-                            fontWeight: '600',
-                            transition: 'all 0.3s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#ef4444';
-                            e.currentTarget.style.color = 'white';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.color = '#ef4444';
-                          }}
-                        >
-                          <span uk-icon="icon: trash; ratio: 0.7" style={{ marginRight: '5px' }}></span>
-                          Delete
-                        </button>
-                      </div>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold text-slate-800 text-center mb-8">
+              Your Vehicles ({cars.length})
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {cars.map((car, index) => (
+                <div 
+                  key={car.id || car._id || index}
+                  className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 border border-slate-100 group hover:-translate-y-1 transition-transform duration-300"
+                >
+                  {/* Default Badge */}
+                  {car.isDefault && (
+                    <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 mb-4">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      DEFAULT
                     </div>
-                    </div>
+                  )}
+                  
+                  {/* Car Icon */}
+                  <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                   </div>
-                ))}
-              </div>
-            </>
-          )}
-          
-          {/* Back to Dashboard */}
-          <div className="uk-text-center uk-margin-large-top">
-            <Link 
-              to="/Customer_dashboard"
-              className="uk-button uk-button-large"
-              style={{
-                background: 'transparent',
-                border: '2px solid #64748b',
-                color: '#94a3b8',
-                borderRadius: '30px',
-                padding: '0 35px',
-                fontWeight: '600',
-                transition: 'all 0.3s ease',
-                textDecoration: 'none'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#f1f5f9';
-                e.currentTarget.style.color = '#f1f5f9';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#64748b';
-                e.currentTarget.style.color = '#94a3b8';
-              }}
-            >
-              <span uk-icon="icon: arrow-left; ratio: 0.8" style={{ marginRight: '8px' }}></span>
-              Back to Dashboard
-            </Link>
-          </div>
+                  
+                  {/* Car Details */}
+                  <h3 className="text-xl font-semibold text-slate-800 mb-2">
+                    {car.model || 'Unknown Model'}
+                  </h3>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-slate-600">
+                      <svg className="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      {car.plate || 'No Plate'}
+                    </div>
+                    
+                    {car.color && (
+                      <div className="flex items-center text-slate-600">
+                        <svg className="w-4 h-4 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                        {car.color}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Notes */}
+                  {car.note && (
+                    <div className="bg-slate-50 rounded-xl p-4 mb-6">
+                      <p className="text-sm text-slate-600 italic">"{car.note}"</p>
+                    </div>
+                  )}
+                  
+                  {/* Action Buttons */}
+                  <div className="flex space-x-3">
+                    <Link
+                      to={`/Car_formPage/${car.id || car._id}`}
+                      className="flex-1 px-4 py-2.5 rounded-xl font-medium text-center text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-colors duration-300"
+                    >
+                      <span className="flex items-center justify-center">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                      </span>
+                    </Link>
+                    
+                    <button
+                      onClick={() => handleDeleteCar(car.id || car._id)}
+                      disabled={deletingId === (car.id || car._id)}
+                      className="flex-1 px-4 py-2.5 rounded-xl font-medium text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300 transition-colors duration-300 disabled:opacity-50"
+                    >
+                      {deletingId === (car.id || car._id) ? (
+                        <span className="flex items-center justify-center">
+                          <svg className="animate-spin -ml-1 mr-1 h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Deleting...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Delete
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+        
+        {/* Back to Dashboard */}
+        <div className="text-center mt-12">
+          <Link
+            to="/Customer_dashboard"
+            className="inline-flex items-center px-6 py-2.5 rounded-xl font-medium text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-300"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Dashboard
+          </Link>
         </div>
       </div>
     </div>

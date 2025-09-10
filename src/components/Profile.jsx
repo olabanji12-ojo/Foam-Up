@@ -5,7 +5,6 @@ import axios from 'axios';
 import UIkit from 'uikit';
 import { baseURL } from '../utils/environments';
 
-
 const Profile = () => {
   const { user: authUser, token, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -51,10 +50,10 @@ const Profile = () => {
 
   if (authLoading || loading) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="uk-card uk-card-body uk-text-center" style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
-          <h3 style={{ color: '#f1f5f9' }}>Loading profile...</h3>
-          <span uk-spinner="ratio: 1.5" style={{ color: '#10b981' }}></span>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 text-center">
+          <h3 className="text-xl font-semibold text-gray-900">Loading profile...</h3>
+          <span uk-spinner="ratio: 1.5" className="text-blue-600"></span>
         </div>
       </div>
     );
@@ -62,18 +61,13 @@ const Profile = () => {
 
   if (error) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="uk-card uk-card-body uk-text-center" style={{ backgroundColor: '#1e293b', borderRadius: '12px', border: '1px solid #334155' }}>
-          <h3 style={{ color: '#f1f5f9' }}>Error Loading Profile</h3>
-          <p style={{ color: '#ef4444' }}>{error}</p>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 text-center">
+          <h3 className="text-xl font-semibold text-gray-900">Error Loading Profile</h3>
+          <p className="text-red-600">{error}</p>
           <button 
-            className="uk-button uk-button-default"
+            className="mt-4 px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
             onClick={() => window.location.reload()}
-            style={{ 
-              marginTop: '20px',
-              borderColor: '#64748b',
-              color: '#94a3b8'
-            }}
           >
             Try Again
           </button>
@@ -83,147 +77,76 @@ const Profile = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0f0f23' }}>
+    <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
-      <div className="uk-section uk-section-primary" 
-           style={{ 
-             background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-             padding: '60px 0'
-           }}>
-        <div className="uk-container">
-          <h1 className="uk-heading-medium uk-text-white uk-text-center">
-            My Profile
-          </h1>
-        </div>
-      </div>
+      
 
       {/* Profile Content */}
-      <div className="uk-section" style={{ backgroundColor: '#0f0f23' }}>
-        <div className="uk-container uk-container-small">
-          <div className="uk-card uk-card-default uk-card-body" 
-               style={{ 
-                 backgroundColor: '#1e293b',
-                 borderRadius: '16px',
-                 border: '1px solid #334155'
-               }}>
-            <div className="uk-grid-medium" data-uk-grid>
-              <div className="uk-width-1-4@s">
-                <div className="uk-card uk-card-body uk-text-center">
-                  {/*  UPDATED: Display Cloudinary Image or Default Avatar */}
-                  <div className="uk-border-circle" 
-                       style={{
-                         width: '120px',
-                         height: '120px',
-                         margin: '0 auto',
-                         overflow: 'hidden', // Important for circular image
-                         position: 'relative' 
-
-                       }}>
-                    {profile?.profile_photo ? (
-                      // Display Cloudinary image if available
-                      <img 
-                        src={profile.profile_photo} 
-                        alt={`${profile.name}'s profile`}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover', // Ensures image covers the circle properly
-                          objectPosition: 'center'
-                        }}
-                        onError={(e) => {
-                          // Fallback to default avatar if image fails to load
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    
-                    {/* Default Avatar - shows if no profile photo or image fails */}
-                    <div 
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-                        display: profile?.profile_photo ? 'none' : 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '50%'
+      <div className="py-12 ">
+        <div className="container mx-auto max-w-2xl mt-30" uk-scrollspy="cls: uk-animation-slide-bottom-small; target: .card; delay: 200">
+          <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 mt- ">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+              <div className="sm:col-span-1 text-center">
+                <div className="relative w-32 h-32 mx-auto">
+                  {profile?.profile_photo ? (
+                    <img 
+                      src={profile.profile_photo} 
+                      alt={`${profile.name}'s profile`}
+                      className="w-full h-full rounded-full object-cover border-2 border-gray-200"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
                       }}
-                    >
-                      <span uk-icon="icon: user; ratio: 2" style={{ color: 'white' }}></span>
-                    </div>
+                    />
+                  ) : null}
+                  <div 
+                    className={`w-full h-full rounded-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500 ${profile?.profile_photo ? 'hidden' : 'flex'}`}
+                  >
+                    <span uk-icon="icon: user; ratio: 2" className="text-white"></span>
                   </div>
-                  
-                  {/* ✨ NEW: Image upload status indicator */}
-                  {profile?.profile_photo && (
-                    <div style={{ 
-                      marginTop: '8px',
-                      fontSize: '12px',
-                      color: '#10b981',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '4px'
-                    }}>
-                      <span uk-icon="icon: check; ratio: 0.8"></span>
-                      Profile Photo
-                    </div>
-                  )}
                 </div>
+                {profile?.profile_photo && (
+                  <div className="mt-2 flex items-center justify-center gap-1 text-sm text-blue-600">
+                    <span uk-icon="icon: check; ratio: 0.8"></span>
+                    Profile Photo
+                  </div>
+                )}
               </div>
               
-              <div className="uk-width-3-4@s">
-                <div className="uk-card uk-card-body">
-                  <h2 style={{ color: '#f1f5f9' }}>{profile?.name || 'No name provided'}</h2>
-                  
-                  <div className="uk-margin-top">
-                    <div className="uk-grid-small" data-uk-grid>
-                      <div className="uk-width-1-2@s">
-                        <h4 style={{ color: '#f1f5f9' }}>Account Information</h4>
-                        <p style={{ color: '#94a3b8' }}>
-                          <span uk-icon="icon: mail" className="uk-margin-small-right"></span>
-                          {profile?.email}
-                        </p>
-                        <p style={{ color: '#94a3b8' }}>
-                          <span uk-icon="icon: receiver" className="uk-margin-small-right"></span>
-                          {profile?.phone || 'No phone number'}
-                        </p>
-                      </div>
-                      
-                      <div className="uk-width-1-2@s">
-                        <h4 style={{ color: '#f1f5f9' }}>Account Type</h4>
-                        <p style={{ color: '#94a3b8' }}>
-                          <span uk-icon="icon: user" className="uk-margin-small-right"></span>
-                          {profile?.account_type || 'N/A'}
-                        </p>
-                        <p style={{ color: '#94a3b8' }}>
-                          <span uk-icon="icon: lock" className="uk-margin-small-right"></span>
-                          {profile?.role || 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="uk-margin-top">
-                      <button
-                        className="uk-button uk-button-primary"
-                        style={{
-                          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                          borderRadius: '20px'
-                        }}
-                      >
-                        <span uk-icon="icon: pencil" className="uk-margin-small-right"></span>
-                        <Link
-                          to={`/Profile_Edit/${profile?.id}`}
-                          style={{
-                            color: '#f1f5f9',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          Edit Profile 
-                        </Link>
-                      </button>
-                    </div>
+              <div className="sm:col-span-3">
+                <h2 className="text-2xl font-semibold text-gray-900">{profile?.name || 'No name provided'}</h2>
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900">Account Information</h4>
+                    <p className="text-gray-600 mt-2 flex items-center">
+                      <span uk-icon="icon: mail" className="mr-2 text-blue-600"></span>
+                      {profile?.email}
+                    </p>
+                    <p className="text-gray-600 mt-2 flex items-center">
+                      <span uk-icon="icon: receiver" className="mr-2 text-blue-600"></span>
+                      {profile?.phone || 'No phone number'}
+                    </p>
                   </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900">Account Type</h4>
+                    <p className="text-gray-600 mt-2 flex items-center">
+                      <span uk-icon="icon: user" className="mr-2 text-blue-600"></span>
+                      {profile?.account_type || 'N/A'}
+                    </p>
+                    <p className="text-gray-600 mt-2 flex items-center">
+                      <span uk-icon="icon: lock" className="mr-2 text-blue-600"></span>
+                      {profile?.role || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <Link
+                    to={`/Profile_Edit/${profile?.id}`}
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:shadow-md transition-all"
+                  >
+                    <span uk-icon="icon: pencil" className="mr-2"></span>
+                    Edit Profile
+                  </Link>
                 </div>
               </div>
             </div>

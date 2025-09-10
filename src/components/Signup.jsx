@@ -82,9 +82,8 @@ const Signup = () => {
       const data = await res.json();
       console.log('Registered successfully:', data);
 
-      if(accountDetails.account_type === 'car_owner' && accountDetails.role === 'car_owner'){
-        navigate('/login')
-      } 
+      navigate('/login')
+      
       
     } catch (err) {
       console.error(err);

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import UIkit from 'uikit';
+import 'uikit/dist/css/uikit.min.css';
+import 'uikit/dist/js/uikit.min.js';
 
 const Customer_dashboard = () => {
   const { user } = useAuth();
@@ -54,7 +57,9 @@ const Customer_dashboard = () => {
 
         {/* Hero Welcome Section */}
 
-        <section className="container mx-auto px-6 py-12 text-center">
+        <section className="container mx-auto px-6 py-12 text-center"
+          uk-scrollspy="target: > div; cls: uk-animation-slide-top-medium; delay: 100; repeat: true"
+        >
 
           <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 ">
             Welcome back, <span className="text-blue-600">{user?.name || 'Car Owner'}</span>!
@@ -65,8 +70,12 @@ const Customer_dashboard = () => {
         </section>
 
         {/* Quick Actions - Main Cards */}
-        <section className="container mx-auto px-6 pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <section className="container mx-auto px-6 pb-16"
+          uk-scrollspy="cls: uk-animation-slide-top-medium; repeat: true"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
+             uk-scrollspy="target: > div; cls: uk-animation-slide-bottom-medium; delay: 200; repeat: true"
+          >
 
             {/* Find Car Wash Card */}
             <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-slate-100 text-center">
@@ -115,7 +124,9 @@ const Customer_dashboard = () => {
         </section>
 
         {/* Dashboard Overview Section */}
-        <section className="container mx-auto px-6 pb-20">
+        <section className="container mx-auto px-6 pb-20"
+         uk-scrollspy="target: > h2, > p, > div; cls: uk-animation-slide-bottom-medium; delay: 100; repeat: true"
+        >
           <h2 className="text-3xl font-bold text-center text-slate-800 mb-12">Your Dashboard Overview</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -165,7 +176,9 @@ const Customer_dashboard = () => {
           </div>
         </section>
              {/* Footer Section */}
-             <footer className="bg-slate-800 text-white pt-12 pb-8 mt-auto">
+             <footer className="bg-slate-800 text-white pt-12 pb-8 mt-auto"
+              uk-scrollspy="cls: uk-animation-slide-left-medium; delay: 300; repeat: true"
+             >
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               
@@ -205,7 +218,9 @@ const Customer_dashboard = () => {
               </div>
 
               {/* Quick Links */}
-              <div>
+              <div
+                uk-scrollspy="cls: uk-animation-slide-right-medium; delay: 300; repeat: true"
+              >
                 <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
                 <ul className="space-y-2">
                   <li><Link to="/" className="text-slate-300 hover:text-white transition-colors duration-300 text-sm">Home</Link></li>
@@ -216,7 +231,9 @@ const Customer_dashboard = () => {
               </div>
 
               {/* Customer Support */}
-              <div>
+              <div 
+                 uk-scrollspy="cls: uk-animation-slide-right-medium; delay: 400; repeat: true"
+              >
                 <h4 className="text-lg font-semibold mb-4">Support</h4>
                 <ul className="space-y-2">
                   <li><Link to="/help" className="text-slate-300 hover:text-white transition-colors duration-300 text-sm">Help Center</Link></li>
@@ -227,7 +244,9 @@ const Customer_dashboard = () => {
               </div>
 
               {/* Contact Info */}
-              <div>
+              <div
+                 uk-scrollspy="cls: uk-animation-slide-right-medium; delay: 500; repeat: true"
+              >
                 <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
                 <div className="space-y-2 text-sm text-slate-300">
                   <p>📧 support@foamup.com</p>
