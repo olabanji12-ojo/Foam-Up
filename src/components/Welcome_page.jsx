@@ -1,10 +1,17 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import UIkit from 'uikit';
 import 'uikit/dist/css/uikit.min.css';
 import 'uikit/dist/js/uikit.min.js';
+import { useNavigate } from "react-router-dom";
+import { baseURL } from '../utils/environments';
+// import { useAuth } from '../context/AuthContext';
+
 
 const WelcomePage = () => {
+const navigate = useNavigate()
+
+
   return (
     <>
       {/* Google Fonts */}
@@ -16,7 +23,7 @@ const WelcomePage = () => {
           .font-fredoka { font-family: 'Fredoka', sans-serif; }
         `}
       </style>
-
+      
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20">
         {/* Hero Section */}
         <section

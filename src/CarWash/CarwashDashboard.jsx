@@ -423,7 +423,7 @@ const CarwashDashboard = () => {
         <nav className="mb-6 mt-30 ">
           <ul className="flex flex-wrap gap-2 border-b border-gray-200">
             {["dashboard", "bookings", "services", "settings"].map((tab) => (
-              <li key={tab}>
+              <li key={tab}>  
                 <button
                   className={`px-4 py-2 text-sm font-medium flex items-center ${
                     activeTab === tab

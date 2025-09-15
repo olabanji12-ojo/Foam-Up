@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import UIkit from 'uikit';
-import { baseURL } from '../utils/environments';
+import { baseURL } from '../utils/environments'; 
 
 const Profile = () => {
   const { user: authUser, token, loading: authLoading } = useAuth();

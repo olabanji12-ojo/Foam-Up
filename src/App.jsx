@@ -20,6 +20,10 @@ import CarWashFinderMap from './components/CarWashFinderMap';
 import Welcome_page from './components/Welcome_page';
 import CarwashDashboard from './CarWash/CarwashDashboard';
 import PostOnboarding from './CarWash/PostOnboarding';
+import AuthCallback from './components/google_redirect';
+import CallbackPage from './components/CallbackPage';
+
+
 
 
 const App = () => {
@@ -45,17 +49,16 @@ const App = () => {
         
         <Route path="/CarWashFinderMap" element={<CarWashFinderMap />} /> 
         <Route path="/CarwashDashboard/:id" element={<CarwashDashboard />} /> 
+        <Route path="/CallbackPage" element={<CallbackPage />} />
 
 
         <Route path="/PostOnboarding/:id" element={<PostOnboarding />} /> 
 
-
-        
-
+        <Route path="/api/callback" element={<AuthCallback />} />
 
         <Route path="/Profile/:id" element={
   
-          <ErrorBoundary>
+          <ErrorBoundary> 
           <Profile />
           </ErrorBoundary>
 
