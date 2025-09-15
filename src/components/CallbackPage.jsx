@@ -9,7 +9,7 @@ const CallbackPage = () => {
   const { login } = useAuth();
 
   useEffect(() => {
-    fetch(`${baseURL}/user/me/`, { credentials: "include" }) // ⬅️ includes cookie
+    fetch(`${baseURL}/user/callback/me`, { credentials: "include" }) // ⬅️ includes cookie
       .then(res => res.json())
       .then(data => {
         console.log("📡 /user/me response body:", data);

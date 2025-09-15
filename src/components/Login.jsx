@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { baseURL } from '../utils/environments';
+// import  
 
 const Login = () => {
   const { login, user, isAuthenticated } = useAuth();
@@ -239,7 +240,7 @@ const Login = () => {
             {/* Social Login */}
                        {/* Social Login */}
                        <div className="grid grid-cols-2 gap-4">
-             {accountDetails?.account_type === 'car_owner' && accountDetails?.role === 'car_owner' && (
+             {user?.account_type === 'car_owner' && user?.role === 'car_owner' && (
                <button
                  className="flex items-center justify-center gap-3 py-3 px-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all duration-300 font-fredoka font-medium"
                  onClick={() => {
@@ -256,7 +257,7 @@ const Login = () => {
                </button>
              )}
            
-             {accountDetails?.account_type === 'car_wash' && accountDetails?.role === 'business_owner' && (
+             {user?.account_type === 'car_wash' && user?.role === 'business_owner' && (
                <button
                  className="flex items-center justify-center gap-3 py-3 px-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all duration-300 font-fredoka font-medium"
                  onClick={() => {

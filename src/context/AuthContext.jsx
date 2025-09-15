@@ -1,67 +1,72 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { baseURL } from "../utils/environments";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import {baseURL} from '../utils/environments';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null); // optional if using cookie
+  const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const initializeAuth = async () => {
+  
+  useEffect(() => { 
+    const initializeAuth = () => {
       try {
-        const storedUser = localStorage.getItem("user");
-        const storedToken = localStorage.getItem("token");
+        const storedUser = localStorage.getItem('user');
+        const storedToken = localStorage.getItem('token');
 
-        console.log("AuthContext initializing...");
-        console.log("Stored user:", storedUser);
-        console.log("Stored token:", storedToken ? "present" : "missing");
+        console.log('AuthContext initializing...');
+        console.log('Stored user:', storedUser);
+        console.log('Stored token:', storedToken ? 'present' : 'missing');
 
         if (storedUser && storedToken) {
-          // ✅ Case 1: JWT-based auth
           const parsedUser = JSON.parse(storedUser);
+          console.log('Setting user and auth:', parsedUser);
           setUser(parsedUser);
           setToken(storedToken);
           setIsAuthenticated(true);
         } 
         
         else if (storedToken) {
-          // ✅ Case 2: token exists but user not stored → fetch
-          const res = await fetch(`${baseURL}/user/me`, {
+          fetch(`${baseURL}/user/me`, {
             headers: { Authorization: `Bearer ${storedToken}` },
-          });
-          const data = await res.json();
-          if (data.success && data.user) {
-            localStorage.setItem("user", JSON.stringify(data.user));
-            setUser(data.user);
-            setToken(storedToken);
-            setIsAuthenticated(true);
-          } else {
-            logout();
-          }
-        } 
+          })
+            .then(res => res.json())
+            .then(data => {
+              localStorage.setItem("user", JSON.stringify(data.user));
+              setUser(data.user);
+              setToken(storedToken);
+              setIsAuthenticated(true);
+            })
+            .catch(err => {
+              console.error("Failed to fetch user:", err);
+              localStorage.removeItem("token");
+              logout();
+            });
+        }
         
-        else {
-          // ✅ Case 3: no token → try cookie-based auth
-          const res = await fetch(`${baseURL}/user/me`, {
-            credentials: "include", // send cookies
-          });
-          const data = await res.json();
-          if (data.success && data.data?.user) {
-            const user = data.data.user;
-            setUser(user);
-            setIsAuthenticated(true);
-            localStorage.setItem("user", JSON.stringify(user));
-          } else {
-            logout();
-          }
+         else {
+          console.log('No user or token in localStorage, clearing...');
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          setUser(null);
+          setToken(null);
+          setIsAuthenticated(false);
         }
       } catch (error) {
-        console.error("Error initializing auth:", error);
-        logout();
+        console.error('Error initializing auth:', error);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        setUser(null);
+        setToken(null);
+        setIsAuthenticated(false);
       } finally {
+        console.log('AuthContext initialization complete, state:', {
+          loading: false,
+          isAuthenticated,
+          user: user ? user.id : null,
+          token: token ? 'present' : 'missing',
+        });
         setLoading(false);
       }
     };
@@ -69,24 +74,20 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = (userData, token = null) => {
+  const login = (userData, token) => {
     setUser(userData);
     setToken(token);
     setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("token"); // cookie mode
-    }
-  };
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', token);
+  }; 
 
   const logout = () => {
     setUser(null);
     setToken(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   const value = {
@@ -104,7 +105,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
