@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import axiosClient from '../utils/axiosClient'; // ✅ import your axios instance
+import axiosClient from '../axiosConfiguration/axiosClient';
+
 
 const AuthContext = createContext();
 
