@@ -4,12 +4,13 @@ import { baseURL } from '../utils/environments';
 import { useParams } from 'react-router-dom';
 import 'uikit/dist/css/uikit.min.css';
 import { useAuth } from '../context/AuthContext';
+import axiosClient from '../axiosConfiguration/axiosClient';
 
 const PostOnboarding = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -38,55 +39,49 @@ const PostOnboarding = () => {
 
   useEffect(() => {
     // Fetch user info when component mounts
-    // Replace the fetchUser function in PostOnboarding.jsx
-const fetchUser = async () => {
-    try {
-      console.log('=== POSTONBOARDING DEBUG ===');
-      console.log('Fetching user with ID:', id);
-      console.log('Request URL:', `${baseURL}/user/${id}`);
-      
-      const response = await fetch(`${baseURL}/user/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
+    const fetchUser = async () => {
+      try {
+        console.log('=== POSTONBOARDING DEBUG ===');
+        console.log('Fetching user with ID:', id);
+        console.log('Request URL:', `${baseURL}/user/${id}`);
+        
+        const response = await axiosClient.get(`/user/${id}`);
+        
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.status >= 200 && response.status < 300);
+        
+        if (response.status !== 200) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      });
-      
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const res = data.data
-      console.log('Fetched user data:', data);
-      console.log('User carwash_id:', res.carwash_id);
-      console.log('carwash_id type:', typeof data.carwash_id);
-      console.log('carwash_id exists?', !!data.carwash_id);
+        
+        const data = response.data;
+        const res = data.data;
+        console.log('Fetched user data:', data);
+        console.log('User carwash_id:', res.carwash_id);
+        console.log('carwash_id type:', typeof data.carwash_id);
+        console.log('carwash_id exists?', !!data.carwash_id);
   
-      // Check all possible carwash_id variations
-      console.log('Checking all carwash_id variations:');
-      console.log('- data.carwash_id:', data.carwash_id);
-      console.log('- data.CarWashID:', data.CarWashID);
-      console.log('- data.carwashId:', data.carwashId);
-      console.log('- data.carWashId:', data.carWashId);
+        // Check all possible carwash_id variations
+        console.log('Checking all carwash_id variations:');
+        console.log('- data.carwash_id:', data.carwash_id);
+        console.log('- data.CarWashID:', data.CarWashID);
+        console.log('- data.carwashId:', data.carwashId);
+        console.log('- data.carWashId:', data.carWashId);
      
-      // If CarWashID exists → redirect to dashboard
-      if (res.carwash_id) {
-        console.log('carwash_id found, redirecting to dashboard');
-        console.log('carwash_id value:', data.carwash_id);
-        navigate(`/CarwashDashboard/${res.id}`);
-      } else {
-        console.log('No carwash_id found, staying on onboarding page');
+        // If carwash_id exists → redirect to dashboard
+        if (res.carwash_id) {
+          console.log('carwash_id found, redirecting to dashboard');
+          console.log('carwash_id value:', data.carwash_id);
+          navigate(`/CarwashDashboard/${res.id}`);
+        } else {
+          console.log('No carwash_id found, staying on onboarding page');
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Error fetching user:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
     fetchUser();
   }, [navigate]);
@@ -114,7 +109,6 @@ const fetchUser = async () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
   
     const transformedData = {
       name: formData.name,
@@ -140,18 +134,10 @@ const fetchUser = async () => {
     };
   
     try {
-      const response = await fetch(`${baseURL}/carwashes`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(transformedData),
-      });
+      const response = await axiosClient.post('/carwashes', transformedData);
   
-      if (!response.ok) throw new Error("Failed to submit form");
-      // console.log(data)
-      navigate(`/CarwashDashboard/${res.id}`);
+      if (response.status !== 201) throw new Error("Failed to submit form");
+      navigate(`/CarwashDashboard/${response.data.data.id}`);
     } catch (err) {
       console.error(err);
     }
@@ -214,9 +200,7 @@ const fetchUser = async () => {
               />
             </div>
 
-            {/* Address  would add this mapbox address loader and would turn that address to points on the map */}
-            {/* then the address coordinate would be added to the longitude and latitude */}
-
+            {/* Address */}
             <div className="card bg-white border border-gray-200 rounded-lg p-4">
               <label htmlFor="address" className="block text-sm font-medium text-gray-700">
                 Address

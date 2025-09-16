@@ -3,58 +3,32 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { baseURL } from '../utils/environments';
 import 'uikit/dist/css/uikit.min.css';
+import axiosClient from '../axiosConfiguration/axiosClient';
 
 export const bookingService = {
   getUserCars: async () => {
-    const response = await fetch(`${baseURL}/cars/my`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.json();
+    const response = await axiosClient.get('/cars/my');
+    return response.data;
   },
 
   getCarwashes: async () => {
-    const response = await fetch(`${baseURL}/carwashes`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.json();
+    const response = await axiosClient.get('/carwashes');
+    return response.data;
   },
 
   getAvailableSlots: async (carwashId, date) => {
-    const response = await fetch(`${baseURL}/bookings/carwash/${carwashId}/date?date=${date}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.json();
+    const response = await axiosClient.get(`/bookings/carwash/${carwashId}/date?date=${date}`);
+    return response.data;
   },
 
   createBooking: async (bookingData) => {
-    const response = await fetch(`${baseURL}/bookings`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(bookingData),
-    });
-    return response.json();
+    const response = await axiosClient.post('/bookings', bookingData);
+    return response.data;
   },
 
-  getMyBookings: async () => {
-    const response = await fetch(`${baseURL}/bookings/user/me`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.json();
+  getMyBookings: async (endpoint) => {
+    const response = await axiosClient.get(endpoint);
+    return response.data;
   },
 };
 
@@ -296,12 +270,12 @@ const Booking = () => {
         notes: formData.notes,
       };
 
-      const response = await bookingService.createBooking(bookingData);
-      if (response.success || response.id) {
+      const response = await axiosClient.post('/bookings', bookingData);
+      if (response.data.success || response.data.id) {
         alert('Booking created successfully!');
         navigate('/Booking_display');
       } else {
-        setErrors({ general: response.message || 'Failed to create booking' });
+        setErrors({ general: response.data.message || 'Failed to create booking' });
       }
     } catch (error) {
       console.error('Error creating booking:', error);

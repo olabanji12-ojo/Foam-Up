@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import { baseURL } from "../utils/environments";
+import axiosClient from "../axiosConfiguration/axiosClient";
 
 const CarWashFinderMap = () => {
   const mapContainerRef = useRef();
   const mapRef = useRef();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
   const [scriptsLoaded, setScriptsLoaded] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedRadius, setSelectedRadius] = useState(10);
@@ -124,17 +125,9 @@ const CarWashFinderMap = () => {
   // FETCH NEARBY CAR WASHES FROM BACKEND
   const searchNearbyCarWashes = async (lat, lng, radius) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No authentication token found. Please log in.");
-      
-      const response = await fetch(
-        `${baseURL}/carwashes/nearby/?lat=${lat}&lng=${lng}&radius=${radius}`,
-        { method: "GET", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } }
-      );
+      const response = await axiosClient.get(`/carwashes/nearby/?lat=${lat}&lng=${lng}&radius=${radius}`);
 
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-      const responseData = await response.json();
+      const responseData = response.data;
       let carWashData;
       
       if (responseData.success && responseData.data && Array.isArray(responseData.data.carwashes)) {
@@ -192,9 +185,9 @@ const CarWashFinderMap = () => {
     } catch (err) {
       console.error("❌ Error fetching car washes:", err);
       setError(
-        err.message.includes("token")
+        err.response?.data?.message?.includes("token")
           ? "Please log in to access nearby car washes."
-          : `Failed to fetch nearby car washes: ${err.message}`
+          : `Failed to fetch nearby car washes: ${err.response?.data?.message || err.message}`
       );
       setCarWashes([]);
     }
@@ -243,10 +236,9 @@ const CarWashFinderMap = () => {
         ? carWash.services.join(", ") 
         : "No services listed";
 
-      // NEW: Function to handle navigation to profile
       const viewProfile = () => {
         console.log("Navigating to car wash profile:", carWash.id);
-        navigate(`/carwash-profile/${carWash.id}`); // Navigate to profile page
+        navigate(`/carwash-profile/${carWash.id}`);
       };
 
       const popupContent = `
@@ -331,18 +323,16 @@ const CarWashFinderMap = () => {
       window.location.href = `tel:${phoneNumber}`;
     };
 
-    // NEW: Global function to view car wash profile
     window.viewCarWashProfile = (carWashId) => {
       navigate(`/carwash-profile/${carWashId}`);
     };
 
     return () => {
-      // Cleanup global functions if component unmounts
       delete window.getDirections;
       delete window.callCarWash;
       delete window.viewCarWashProfile;
     };
-  }, [userLocation, navigate]); // Added navigate to dependencies
+  }, [userLocation, navigate]);
 
   const handleRadiusChange = async (newRadius) => {
     setSelectedRadius(newRadius);
@@ -374,9 +364,7 @@ const CarWashFinderMap = () => {
   }
 
   return (
-    <div className="relative h-screen w-full font-fredoka pt-18 "> {/* Added font-fredoka */}
-      
-      {/* Control Panel - Styled with Tailwind */}
+    <div className="relative h-screen w-full font-fredoka pt-18">
       <div className="absolute top-4 left-4 z-10 bg-white p-6 rounded-xl shadow-lg min-w-80 pt-40">
         <h3 className="text-xl font-semibold text-slate-800 mb-4">🚗 Find Car Washes</h3>
         
@@ -433,13 +421,11 @@ const CarWashFinderMap = () => {
         )}
       </div>
 
-      {/* Map Container */}
       <div
         ref={mapContainerRef}
         className="w-full h-full rounded-xl overflow-hidden"
       />
       
-      {/* Loading Overlay */}
       {!scriptsLoaded && (
         <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-20 rounded-xl">
           <div className="text-center p-6 bg-white rounded-lg shadow-lg">
@@ -454,4 +440,3 @@ const CarWashFinderMap = () => {
 };
 
 export default CarWashFinderMap;
-

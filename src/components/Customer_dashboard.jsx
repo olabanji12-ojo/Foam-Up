@@ -24,7 +24,6 @@ const Customer_dashboard = () => {
         longitude: position.coords.longitude,
       };
       console.log("✅ Location found:", userLocation);
-      // Navigate to map with location data
       navigate("/CarWashFinderMap", { 
         state: { 
           userLocation,
@@ -44,7 +43,6 @@ const Customer_dashboard = () => {
 
   return (
     <>
-      {/* Consistent Font Setup */}
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&display=swap');
@@ -52,15 +50,10 @@ const Customer_dashboard = () => {
         `}
       </style>
 
-      {/* Main Container with Welcome Page Gradient */}
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 font-fredoka pt-25">
-
-        {/* Hero Welcome Section */}
-
         <section className="container mx-auto px-6 py-12 text-center"
           uk-scrollspy="target: > div; cls: uk-animation-slide-top-medium; delay: 100; repeat: true"
         >
-
           <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 ">
             Welcome back, <span className="text-blue-600">{user?.name || 'Car Owner'}</span>!
           </h1>
@@ -69,15 +62,12 @@ const Customer_dashboard = () => {
           </p>
         </section>
 
-        {/* Quick Actions - Main Cards */}
         <section className="container mx-auto px-6 pb-16"
           uk-scrollspy="cls: uk-animation-slide-top-medium; repeat: true"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
              uk-scrollspy="target: > div; cls: uk-animation-slide-bottom-medium; delay: 200; repeat: true"
           >
-
-            {/* Find Car Wash Card */}
             <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-slate-100 text-center">
               <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
                 <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +92,6 @@ const Customer_dashboard = () => {
               </button>
             </div>
 
-            {/* Add Vehicle Card */}
             <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-slate-100 text-center">
               <div className="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6">
                 <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,15 +112,12 @@ const Customer_dashboard = () => {
           </div>
         </section>
 
-        {/* Dashboard Overview Section */}
         <section className="container mx-auto px-6 pb-20"
          uk-scrollspy="target: > h2, > p, > div; cls: uk-animation-slide-bottom-medium; delay: 100; repeat: true"
         >
           <h2 className="text-3xl font-bold text-center text-slate-800 mb-12">Your Dashboard Overview</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-
-            {/* My Vehicles Card */}
             <Link 
               to="/My_Cars" 
               className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 border border-slate-100 text-center group hover:-translate-y-1 transition-transform duration-300 no-underline"
@@ -145,7 +131,6 @@ const Customer_dashboard = () => {
               <p className="text-sm text-slate-500">Manage your cars</p>
             </Link>
 
-            {/* Bookings Card */}
             <Link 
               to="/Booking" 
               className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 border border-slate-100 text-center group hover:-translate-y-1 transition-transform duration-300 no-underline"
@@ -159,7 +144,6 @@ const Customer_dashboard = () => {
               <p className="text-sm text-slate-500">View appointments</p>
             </Link>
 
-            {/* Favourites Card */}
             <div 
               className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 border border-slate-100 text-center group hover:-translate-y-1 transition-transform duration-300 cursor-pointer" 
               onClick={() => {/* Navigate to favourites */}}
@@ -172,17 +156,14 @@ const Customer_dashboard = () => {
               <h4 className="text-lg font-semibold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">Favourites</h4>
               <p className="text-sm text-slate-500">Saved car washes</p>
             </div>
-
           </div>
         </section>
-             {/* Footer Section */}
-             <footer className="bg-slate-800 text-white pt-12 pb-8 mt-auto"
-              uk-scrollspy="cls: uk-animation-slide-left-medium; delay: 300; repeat: true"
-             >
+
+        <footer className="bg-slate-800 text-white pt-12 pb-8 mt-auto"
+          uk-scrollspy="cls: uk-animation-slide-left-medium; delay: 300; repeat: true"
+        >
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              
-              {/* Brand Column */}
               <div className="md:col-span-1">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
@@ -217,7 +198,6 @@ const Customer_dashboard = () => {
                 </div>
               </div>
 
-              {/* Quick Links */}
               <div
                 uk-scrollspy="cls: uk-animation-slide-right-medium; delay: 300; repeat: true"
               >
@@ -230,7 +210,6 @@ const Customer_dashboard = () => {
                 </ul>
               </div>
 
-              {/* Customer Support */}
               <div 
                  uk-scrollspy="cls: uk-animation-slide-right-medium; delay: 400; repeat: true"
               >
@@ -243,7 +222,6 @@ const Customer_dashboard = () => {
                 </ul>
               </div>
 
-              {/* Contact Info */}
               <div
                  uk-scrollspy="cls: uk-animation-slide-right-medium; delay: 500; repeat: true"
               >
@@ -254,10 +232,8 @@ const Customer_dashboard = () => {
                   <p>📍 123 Car Care Ave, City</p>
                 </div>
               </div>
-
             </div>
 
-            {/* Bottom Copyright Bar */}
             <div className="border-t border-slate-700 mt-8 pt-6 text-center">
               <p className="text-slate-400 text-sm">
                 © {new Date().getFullYear()} FoamUP. All rights reserved.
@@ -265,7 +241,7 @@ const Customer_dashboard = () => {
             </div>
           </div>
         </footer>
-      </div> {/* This closes the main div */}
+      </div>
     </>
   );
 };

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { bookingService } from './Booking';
 import { baseURL } from '../utils/environments';
+import axiosClient from '../axiosConfiguration/axiosClient';
 
 const BookingDisplay = () => {
   const { user, token, isAuthenticated } = useAuth();
@@ -56,19 +57,12 @@ const BookingDisplay = () => {
     if (!window.confirm('Are you sure you want to cancel this booking?')) return;
 
     try {
-      const response = await fetch(`${baseURL}/bookings/${bookingId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      const data = await response.json();
-      if (data.success) {
+      const response = await axiosClient.delete(`/bookings/${bookingId}`);
+      if (response.data.success) {
         setBookings(bookings.filter((booking) => booking.id !== bookingId));
         alert('Booking cancelled successfully');
       } else {
-        setError(data.message || 'Failed to cancel booking');
+        setError(response.data.message || 'Failed to cancel booking');
       }
     } catch (error) {
       console.error('Error cancelling booking:', error);
@@ -78,15 +72,8 @@ const BookingDisplay = () => {
 
   const handleAcceptBooking = async (bookingId) => {
     try {
-      const response = await fetch(`${baseURL}/bookings/${bookingId}/accept`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      const data = await response.json();
-      if (data.success) {
+      const response = await axiosClient.put(`/bookings/${bookingId}/accept`);
+      if (response.data.success) {
         setBookings(
           bookings.map((booking) =>
             booking.id === bookingId ? { ...booking, status: 'confirmed' } : booking
@@ -94,7 +81,7 @@ const BookingDisplay = () => {
         );
         alert('Booking accepted successfully');
       } else {
-        setError(data.message || 'Failed to accept booking');
+        setError(response.data.message || 'Failed to accept booking');
       }
     } catch (error) {
       console.error('Error accepting booking:', error);
@@ -109,20 +96,12 @@ const BookingDisplay = () => {
 
   const submitRating = async () => {
     try {
-      const response = await fetch(`${baseURL}/bookings/${selectedBooking.id}/rate`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ rating }),
-      });
-      const data = await response.json();
-      if (data.success) {
+      const response = await axiosClient.post(`/bookings/${selectedBooking.id}/rate`, { rating });
+      if (response.data.success) {
         alert(`Rated ${rating} stars for booking ${selectedBooking.id}`);
         setSelectedBooking(null);
       } else {
-        setError(data.message || 'Failed to submit rating');
+        setError(response.data.message || 'Failed to submit rating');
       }
     } catch (error) {
       console.error('Error submitting rating:', error);

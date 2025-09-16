@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { baseURL } from "../utils/environments";
 import axios from "axios";
 import 'uikit/dist/css/uikit.min.css';
+import axiosClient from "../axiosConfiguration/axiosClient";
 
 const CarwashDashboard = () => {
   const { user } = useAuth();
@@ -114,10 +115,7 @@ const CarwashDashboard = () => {
     const fetchCarwash = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${baseURL}/carwashes/${carwashId}`, {
-          headers: { 
-            Authorization: `Bearer ${token}` 
-          },
+        const res = await axiosClient.get(`/carwashes/${carwashId}`, {
         });
         
         setCarwash({
@@ -150,18 +148,18 @@ const CarwashDashboard = () => {
       try {
         setLoading(true);
         // Fetch bookings for the selected date
-        const bookingsURL = `${baseURL}/bookings/carwash/${carwashId}/date?date=${slotDate}`;
-        const bookingsRes = await axios.get(bookingsURL, {
-          headers: { Authorization: `Bearer ${token}` },
+        const bookingsURL = `/bookings/carwash/${carwashId}/date?date=${slotDate}`;
+        const bookingsRes = await axiosClient.get(bookingsURL, {
+         
         });
       
         // Fetch services for the carwash
-        const servicesURL = `${baseURL}/carwashes/services/carwash/${carwashId}`;
+        const servicesURL = `/carwashes/services/carwash/${carwashId}`;
         console.log("🛠️ SERVICES REQUEST:");
         console.log("Full services URL:", servicesURL);
         
-        const servicesRes = await axios.get(servicesURL, {
-          headers: { Authorization: `Bearer ${token}` },
+        const servicesRes = await axiosClient.axiosClient(servicesURL, {
+          
         });
 
         const processedBookings = Array.isArray(bookingsRes.data.data) ? bookingsRes.data.data : [];
@@ -196,9 +194,9 @@ const CarwashDashboard = () => {
       console.log("Filter:", bookingsFilter);
       
       setLoading(true);
-      const res = await axios.get(
-        `${baseURL}/bookings/carwash/${carwashId}/filter?status=${bookingsFilter.status}&from=${bookingsFilter.dateFrom}&to=${bookingsFilter.dateTo}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const res = await axiosClient.get(
+        `/bookings/carwash/${carwashId}/filter?status=${bookingsFilter.status}&from=${bookingsFilter.dateFrom}&to=${bookingsFilter.dateTo}`,
+        
       );  
       
       console.log("✅ ALL BOOKINGS RESPONSE:");
@@ -217,10 +215,10 @@ const CarwashDashboard = () => {
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
       setUpdatingBooking(bookingId);
-      const res = await axios.patch(
-        `${baseURL}/bookings/${bookingId}/status`,
+      const res = await axiosClient.patch(
+        `/bookings/${bookingId}/status`,
         { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
+        
       );
       
       console.log("✅ UPDATE BOOKING RESPONSE:", res.data);
@@ -250,8 +248,8 @@ const CarwashDashboard = () => {
     try {
       console.log("🔍 FETCHING SERVICES:");
       setLoading(true);
-      const res = await axios.get(`${baseURL}/carwashes/services/carwash/${carwashId}`, {
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      const res = await axiosClient.get(`/carwashes/services/carwash/${carwashId}`, {
+        
       });
       console.log("✅ SERVICES RESPONSE:", res.data);
       setServices(Array.isArray(res.data.data) ? res.data.data : res.data || []);
@@ -275,10 +273,10 @@ const CarwashDashboard = () => {
           duration: parseInt(serviceForm.duration, 10),
           carwash_id: carwashId,
         };
-        const res = await axios.put(
-          `${baseURL}/carwashes/services/${carwashId}?service_id=${editingService.id}`,
+        const res = await axiosClient.put(
+          `/carwashes/services/${carwashId}?service_id=${editingService.id}`,
           payload,
-          { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } }
+          
         );
         console.log("✅ SERVICE UPDATE RESPONSE:", res.data);
       } else {
@@ -288,10 +286,10 @@ const CarwashDashboard = () => {
           duration: parseInt(serviceForm.duration, 10),
           carwash_id: carwashId,
         };
-        const res = await axios.post(
-          `${baseURL}/carwashes/services/${carwashId}`,
+        const res = await axiosClient.post(
+          `/carwashes/services/${carwashId}`,
           payload,
-          { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } }
+          
         );
         console.log("✅ SERVICE CREATE RESPONSE:", res.data);
       }
@@ -312,8 +310,8 @@ const CarwashDashboard = () => {
     try {
       console.log("🗑️ DELETING SERVICE:", serviceId);
       setLoading(true);
-      await axios.delete(`${baseURL}/carwashes/services/${carwashId}?service_id=${serviceId}`, {
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
+      await axiosClient.delete(`/carwashes/services/${carwashId}?service_id=${serviceId}`, {
+        
       });
       fetchServices();
     } catch (err) {
@@ -329,8 +327,8 @@ const CarwashDashboard = () => {
     try {
       console.log("🔍 FETCHING SETTINGS:");
       setLoading(true);
-      const res = await axios.get(`${baseURL}/carwashes/${carwashId}`, {
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      const res = await axiosClient.get(`/carwashes/${carwashId}`, {
+        
       });
       console.log("✅ SETTINGS RESPONSE:", res.data.data);
       setSettings({
@@ -381,10 +379,10 @@ const CarwashDashboard = () => {
         },
       };
       setUpdatingSettings(true);
-      const res = await axios.put(
-        `${baseURL}/carwashes/${carwashId}`,
+      const res = await axiosClient.put(
+        `/carwashes/${carwashId}`,
         payload,
-        { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } }
+        
       );
       console.log("✅ SETTINGS SAVE RESPONSE:", res.data);
       alert("Settings saved successfully!");

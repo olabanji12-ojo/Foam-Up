@@ -7,10 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { baseURL } from '../utils/environments';
 // import { useAuth } from '../context/AuthContext';
 
-
 const WelcomePage = () => {
 const navigate = useNavigate()
-
 
   return (
     <>

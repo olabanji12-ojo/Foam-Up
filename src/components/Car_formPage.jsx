@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { baseURL } from '../utils/environments';
+import axiosClient from '../axiosConfiguration/axiosClient';
 
 const CarFormPage = () => {
   const { user, isAuthenticated } = useAuth();
@@ -39,18 +39,8 @@ const CarFormPage = () => {
       if (!id) return;
       
       setFetchingCar(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('No authentication token found');
-        setFetchingCar(false);
-        return;
-      }
-
       try {
-        const res = await axios.get(`${baseURL}/cars/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
+        const res = await axiosClient.get(`/cars/${id}`);
         const car = res.data.data;
         setFormData({
           model: car.model || '',
@@ -117,13 +107,6 @@ const CarFormPage = () => {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError('No authentication token found');
-      setLoading(false);
-      return;
-    }
-
     try {
       // Create FormData for file upload
       const submitData = new FormData();
@@ -139,21 +122,13 @@ const CarFormPage = () => {
 
       let response;
       if (isEditMode) {
-        response = await axios.put(`${baseURL}/cars/update/${id}`, submitData, {
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          },
+        response = await axiosClient.put(`/cars/update/${id}`, submitData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
-        // Show success notification
       } else {
-        response = await axios.post(`${baseURL}/cars/`, submitData, {
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          },
+        response = await axiosClient.post('/cars', submitData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
-        // Show success notification
       }
 
       navigate('/Customer_dashboard');
@@ -412,5 +387,3 @@ const CarFormPage = () => {
 };
 
 export default CarFormPage;
-
-

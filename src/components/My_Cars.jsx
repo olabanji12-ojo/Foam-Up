@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { baseURL } from '../utils/environments';
+import axiosClient from '../axiosConfiguration/axiosClient';
 
 const My_Cars = () => {
-  const { token, isAuthenticated, loading, user } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
   const [cars, setCars] = useState([]);
   const [error, setError] = useState(null);
   const [fetchingCars, setFetchingCars] = useState(false);
@@ -14,7 +13,7 @@ const My_Cars = () => {
 
   useEffect(() => {
     const fetchMyCars = async () => {
-      if (loading || !isAuthenticated || !token) {
+      if (loading || !isAuthenticated) {
         console.log('Skipping API call: Auth not ready');
         return;
       }
@@ -23,19 +22,8 @@ const My_Cars = () => {
       setError(null);
 
       try {
-        const response = await fetch(`${baseURL}/cars/my`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const response = await axiosClient.get('/cars/my');
+        const data = response.data;
         
         // Handle different possible response structures
         if (data.data) {
@@ -48,7 +36,7 @@ const My_Cars = () => {
         
         console.log('Fetched cars:', data);
       } catch (error) {
-        setError(error.message);
+        setError(error.response?.data?.message || 'Failed to fetch cars');
         console.error('Error fetching cars:', error.message);
       } finally {
         setFetchingCars(false);
@@ -56,30 +44,23 @@ const My_Cars = () => {
     };
 
     fetchMyCars();
-  }, [token, isAuthenticated, loading]);
+  }, [isAuthenticated, loading]);
 
   const handleDeleteCar = async (carId) => {
     if (!window.confirm('Are you sure you want to delete this vehicle?')) return;
     
     setDeletingId(carId);
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${baseURL}/cars/${carId}`, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      });
+      await axiosClient.delete(`/cars/${carId}`);
       
       // Remove the car from state
       setCars(cars.filter(car => (car.id || car._id) !== carId));
       
       // Show success message
-      // You could implement a toast notification system here
       alert('Vehicle deleted successfully!');
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || 'Failed to delete vehicle');
+      alert(err.response?.data?.message || 'Failed to delete vehicle');
     } finally {
       setDeletingId(null);
     }

@@ -1,72 +1,37 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {baseURL} from '../utils/environments';
+import { baseURL } from '../utils/environments';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  
-  useEffect(() => { 
-    const initializeAuth = () => {
+
+  useEffect(() => {
+    const initializeAuth = async () => {
       try {
-        const storedUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('token');
-
-        console.log('AuthContext initializing...');
-        console.log('Stored user:', storedUser);
-        console.log('Stored token:', storedToken ? 'present' : 'missing');
-
-        if (storedUser && storedToken) {
-          const parsedUser = JSON.parse(storedUser);
-          console.log('Setting user and auth:', parsedUser);
-          setUser(parsedUser);
-          setToken(storedToken);
-          setIsAuthenticated(true);
-        } 
+        console.log("🔄 Checking auth status with cookie...");
         
-        else if (storedToken) {
-          fetch(`${baseURL}/user/me`, {
-            headers: { Authorization: `Bearer ${storedToken}` },
-          })
-            .then(res => res.json())
-            .then(data => {
-              localStorage.setItem("user", JSON.stringify(data.user));
-              setUser(data.user);
-              setToken(storedToken);
-              setIsAuthenticated(true);
-            })
-            .catch(err => {
-              console.error("Failed to fetch user:", err);
-              localStorage.removeItem("token");
-              logout();
-            });
+        const res = await fetch(`${baseURL}/user/me`, {
+          method: "GET",
+          credentials: "include", // 🔑 VERY IMPORTANT to send cookies
+        });
+
+        if (!res.ok) {
+          throw new Error("Not authenticated");
         }
-        
-         else {
-          console.log('No user or token in localStorage, clearing...');
-          localStorage.removeItem('user');
-          localStorage.removeItem('token');
-          setUser(null);
-          setToken(null);
-          setIsAuthenticated(false);
-        }
+
+        const data = await res.json();
+        console.log("✅ User loaded:", data.user);
+
+        setUser(data.user);
+        setIsAuthenticated(true);
       } catch (error) {
-        console.error('Error initializing auth:', error);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
+        console.warn("Auth check failed:", error);
         setUser(null);
-        setToken(null);
         setIsAuthenticated(false);
       } finally {
-        console.log('AuthContext initialization complete, state:', {
-          loading: false,
-          isAuthenticated,
-          user: user ? user.id : null,
-          token: token ? 'present' : 'missing',
-        });
         setLoading(false);
       }
     };
@@ -74,28 +39,23 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = (userData, token) => {
-    setUser(userData);
-    setToken(token);
-    setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('token', token);
-  }; 
-
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch(`${baseURL}/user/logout`, {
+        method: "POST",
+        credentials: "include", // send cookie so backend can clear it
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
     setUser(null);
-    setToken(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
   };
 
   const value = {
     user,
-    token,
     isAuthenticated,
     loading,
-    login,
     logout,
   };
 
@@ -105,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

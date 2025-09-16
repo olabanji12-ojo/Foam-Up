@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import UIkit from 'uikit';
 import { baseURL } from '../utils/environments'; 
+import axiosClient from '../axiosConfiguration/axiosClient';
 
 const Profile = () => {
-  const { user: authUser, token, loading: authLoading } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,11 +18,7 @@ const Profile = () => {
 
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${baseURL}/user/${authUser.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await axiosClient.get(`/user/${authUser.id}`);
          
         setProfile(response.data.data);
       } catch (err) {
@@ -39,7 +35,7 @@ const Profile = () => {
     
 
     fetchProfile();
-  }, [authUser?.id, token, authLoading]);
+  }, [authUser?.id, authLoading]);
 
   // Handle navigation after all hooks
   useEffect(() => {
@@ -78,11 +74,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Hero Section */}
-      
-
-      {/* Profile Content */}
-      <div className="py-12 ">
+      <div className="py-12">
         <div className="container mx-auto max-w-2xl mt-30" uk-scrollspy="cls: uk-animation-slide-bottom-small; target: .card; delay: 200">
           <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 mt- ">
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">

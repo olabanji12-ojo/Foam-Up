@@ -742,7 +742,6 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     navigate("/Login");
-    localStorage.removeItem("token");
     localStorage.removeItem("user");
   };
 

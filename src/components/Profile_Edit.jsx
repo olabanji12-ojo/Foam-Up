@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import UIkit from 'uikit';
 import { baseURL } from '../utils/environments';
+import axiosClient from '../axiosConfiguration/axiosClient';
 
-const ProfileEdit = () => {
-  const { user: authUser, token, loading: authLoading } = useAuth();
+const ProfileEdit = () => { 
+  const { user: authUser, loading: authLoading } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [profile, setProfile] = useState({
@@ -26,11 +26,7 @@ const ProfileEdit = () => {
 
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${baseURL}/user/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await axiosClient.get(`/user/${id}`);
         const userData = response.data.data;
         setProfile(userData);
         // Set current profile photo as preview if exists
@@ -50,7 +46,7 @@ const ProfileEdit = () => {
     };
 
     fetchProfile();
-  }, [id, token, authLoading, authUser?.id]);
+  }, [id, authLoading, authUser?.id]);
 
   useEffect(() => {
     if (!authLoading && !authUser) {
@@ -108,12 +104,7 @@ const ProfileEdit = () => {
         formData.append('profile_photo', profilePhoto);
       }
 
-      await axios.put(`${baseURL}/user/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      await axiosClient.put(`/user/${id}`, formData);
       
       UIkit.notification({
         message: 'Profile updated successfully!',
@@ -163,14 +154,6 @@ const ProfileEdit = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Hero Section */}
-      {/* <div className="bg-white shadow-md py-12">
-        <div className="container mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 text-center">Edit Profile</h1>
-        </div>
-      </div> */}
-
-      {/* Profile Edit Form */}
       <div className="py-12">
         <div className="container mx-auto max-w-2xl" uk-scrollspy="cls: uk-animation-slide-bottom-small; target: .card; delay: 200">
           <div className="card bg-white border border-gray-200 rounded-lg shadow-md p-6 mt-20">
