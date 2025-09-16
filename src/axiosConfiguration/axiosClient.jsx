@@ -1,5 +1,5 @@
 import axios from "axios";
-import { baseURL } from "./environments";
+import { baseURL } from '../utils/environments';
 
 const axiosClient = axios.create({
   baseURL,
