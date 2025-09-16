@@ -185,7 +185,7 @@ const CarWashFinderMap = () => {
     } catch (err) {
       console.error("❌ Error fetching car washes:", err);
       setError(
-        err.response?.data?.message?.includes("token")
+        err.response?.status === 401
           ? "Please log in to access nearby car washes."
           : `Failed to fetch nearby car washes: ${err.response?.data?.message || err.message}`
       );

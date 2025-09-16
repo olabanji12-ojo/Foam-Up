@@ -5,7 +5,7 @@ import UIkit from 'uikit';
 import 'uikit/dist/css/uikit.min.css';
 import 'uikit/dist/js/uikit.min.js';
 
-const Customer_dashboard = () => {
+const Customer_dashboard = () => { 
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isGettingLocation, setIsGettingLocation] = useState(false);

@@ -6,7 +6,7 @@ import { baseURL } from '../utils/environments';
 import axiosClient from '../axiosConfiguration/axiosClient';
 
 const BookingDisplay = () => {
-  const { user, token, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ const BookingDisplay = () => {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!isAuthenticated || !token) {
+      if (!isAuthenticated) {
         setError('Please log in to view bookings');
         setLoading(false);
         return;
@@ -39,7 +39,7 @@ const BookingDisplay = () => {
       }
     };
     fetchBookings();
-  }, [isAuthenticated, token, user]);
+  }, [isAuthenticated,  user]);
 
   const formatDateTime = (dateTimeString) => {
     const options = {

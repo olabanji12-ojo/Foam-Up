@@ -739,11 +739,15 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/Login");
-    localStorage.removeItem("user");
+  const handleLogout = async () => {
+    try {
+      await logout();   // calls backend logout + clears context
+      navigate("/Login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
+  
 
   // === NAV LINKS ===
   let navLinks;

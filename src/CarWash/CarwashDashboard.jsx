@@ -8,7 +8,7 @@ import axiosClient from "../axiosConfiguration/axiosClient";
 
 const CarwashDashboard = () => {
   const { user } = useAuth();
-  const token = localStorage.getItem("token");
+  
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -140,7 +140,7 @@ const CarwashDashboard = () => {
     } else {
       console.log("⏸️ Skipping carwash fetch - no carwashId");
     }
-  }, [carwashId, token]);
+  }, [carwashId]);
 
   // Fetch bookings & services
   useEffect(() => {
@@ -184,7 +184,7 @@ const CarwashDashboard = () => {
     } else {
       console.log("⏸️ Skipping dashboard fetch - no carwashId");
     }
-  }, [carwashId, slotDate, token, carwash.is_active]);
+  }, [carwashId, slotDate, carwash.is_active]);
 
   // Bookings Tab Functions 
   // Fetch all bookings for bookings tab

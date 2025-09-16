@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { baseURL } from '../utils/environments';
+import axiosClient from '../utils/axiosClient'; // ✅ import your axios instance
 
 const AuthContext = createContext();
 
@@ -12,20 +12,12 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       try {
         console.log("🔄 Checking auth status with cookie...");
-        
-        const res = await fetch(`${baseURL}/user/me`, {
-          method: "GET",
-          credentials: "include", // 🔑 VERY IMPORTANT to send cookies
-        });
 
-        if (!res.ok) {
-          throw new Error("Not authenticated");
-        }
+        // ✅ axios automatically includes cookies because axiosClient has withCredentials
+        const res = await axiosClient.get("/user/me");
 
-        const data = await res.json();
-        console.log("✅ User loaded:", data.user);
-
-        setUser(data.user);
+        console.log("✅ User loaded:", res.data.user);
+        setUser(res.data.user);
         setIsAuthenticated(true);
       } catch (error) {
         console.warn("Auth check failed:", error);
@@ -41,10 +33,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch(`${baseURL}/user/logout`, {
-        method: "POST",
-        credentials: "include", // send cookie so backend can clear it
-      });
+      await axiosClient.post("/user/logout"); // ✅ clears cookie on backend
     } catch (error) {
       console.error("Logout failed:", error);
     }

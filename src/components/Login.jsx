@@ -77,11 +77,10 @@ const Login = () => {
 
       console.log('Logged in successfully:', response.data);
 
-      const token = response.data.data.token;
       const userData = response.data.data.user;
       
-      if (token && userData) {
-        login(userData, token);
+      if (userData) {
+        login(userData);
       } else {
         throw new Error('Missing token or user data in response');
       }
