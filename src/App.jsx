@@ -22,6 +22,7 @@ import CarwashDashboard from "./CarWash/CarwashDashboard";
 import PostOnboarding from "./CarWash/PostOnboarding";
 import AuthCallback from "./components/google_redirect";
 import CallbackPage from "./components/CallbackPage";
+// import index.html from "./index.html"
 
 // ✅ Layout with Navbar always on top
 const Layout = () => {
