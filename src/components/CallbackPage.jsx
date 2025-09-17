@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 const CallbackPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, callbackLogin } = useAuth();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -31,7 +31,7 @@ const CallbackPage = () => {
           const user = data.data.user;
 
           // Save in AuthContext
-          login(user, token);
+          callbackLogin(token, user);
 
           // Redirect based on role
           if (user.account_type === "car_owner" && user.role === "car_owner") {
@@ -53,7 +53,7 @@ const CallbackPage = () => {
         console.error("❌ Fetch user failed:", err);
         navigate("/");
       });
-  }, [navigate, location, login]);
+  }, [navigate, location, callbackLogin]);
 
   return <p>Loading... Redirecting...</p>;
 };
