@@ -71,7 +71,7 @@ const PostOnboarding = () => {
         // If carwash_id exists → redirect to dashboard
         if (res.carwash_id) {
           console.log('carwash_id found, redirecting to dashboard');
-          console.log('carwash_id value:', data.carwash_id);
+          console.log('carwash_id value:', res.carwash_id);
           navigate(`/CarwashDashboard/${res.id}`);
         } else {
           console.log('No carwash_id found, staying on onboarding page');
@@ -135,6 +135,11 @@ const PostOnboarding = () => {
   
     try {
       const response = await axiosClient.post('/carwashes', transformedData);
+      console.log('Full response:', response);
+      console.log('Response status:', response.status);
+      console.log('Response data:', response.data);
+      console.log('Trying to navigate to:', `/CarwashDashboard/${response.data.data.id}`);
+    
   
       if (response.status !== 201) throw new Error("Failed to submit form");
       navigate(`/CarwashDashboard/${response.data.data.id}`);
