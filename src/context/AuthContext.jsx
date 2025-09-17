@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import axiosClient from '../axiosConfiguration/axiosClient';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import axiosClient from "../axiosConfiguration/axiosClient";
 
 const AuthContext = createContext();
 
@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // 🔄 Check if token exists on app load
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -37,10 +38,18 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  // 🔑 Normal login (email + password)
   const login = async (email, password) => {
     const res = await axiosClient.post("/user/login", { email, password });
-    const { token, user } = res.data;
+    const { token, user } = res.data.data;
 
+    localStorage.setItem("token", token);
+    setUser(user);
+    setIsAuthenticated(true);
+  };
+
+  // 🔑 Callback login (already have token + user)
+  const callbackLogin = (token, user) => {
     localStorage.setItem("token", token);
     setUser(user);
     setIsAuthenticated(true);
@@ -57,10 +66,15 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     loading,
     login,
+    callbackLogin, // expose callback login
     logout,
+    setUser,
+    setIsAuthenticated,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {

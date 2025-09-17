@@ -1,4 +1,3 @@
-// CallbackPage.jsx
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { baseURL } from "../utils/environments";
@@ -6,21 +5,21 @@ import { useAuth } from "../context/AuthContext";
 
 const CallbackPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { callbackLogin } = useAuth();
 
   useEffect(() => {
-    fetch(`${baseURL}/user/callback/me`, { credentials: "include" }) // ⬅️ includes cookie
-      .then(res => res.json())
-      .then(data => {
-        console.log("📡 /user/me response body:", data);
+    fetch(`${baseURL}/user/callback/me`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("📡 /user/callback/me response:", data);
 
-        if (data.success && data.data?.user) {
-          const user = data.data.user;
+        if (data.success && data.data?.token && data.data?.user) {
+          const { token, user } = data.data;
 
-          // ✅ save user in AuthContext & localStorage
-          login(user, null); // no token needed because cookie is handling it
+          // ✅ store token + user in context/localStorage
+          callbackLogin(token, user);
 
-          // ✅ redirect based on role/account_type
+          // ✅ redirect based on role
           if (user.account_type === "car_owner" && user.role === "car_owner") {
             navigate("/Customer_dashboard");
           } else if (
@@ -37,10 +36,10 @@ const CallbackPage = () => {
         }
       })
       .catch((err) => {
-        console.error("❌ Fetch /user/me failed:", err);
+        console.error("❌ Fetch /user/callback/me failed:", err);
         navigate("/");
       });
-  }, [navigate, login]);
+  }, [navigate, callbackLogin]);
 
   return <p>Loading... Redirecting...</p>;
 };
