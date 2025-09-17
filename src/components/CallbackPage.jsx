@@ -1,25 +1,39 @@
+// CallbackPage.jsx
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { baseURL } from "../utils/environments";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const CallbackPage = () => {
   const navigate = useNavigate();
-  const { callbackLogin } = useAuth();
+  const location = useLocation();
+  const { login } = useAuth();
 
   useEffect(() => {
-    fetch(`${baseURL}/user/callback/me`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("📡 /user/callback/me response:", data);
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
 
-        if (data.success && data.data?.token && data.data?.user) {
-          const { token, user } = data.data;
+    if (!token) {
+      console.warn("❌ No token found in URL, redirecting home");
+      navigate("/");
+      return;
+    }
 
-          // ✅ store token + user in context/localStorage
-          callbackLogin(token, user);
+    // Save token and load user info from backend
+    localStorage.setItem("token", token);
 
-          // ✅ redirect based on role
+    // Call your backend to fetch user details using the token
+    fetch("http://localhost:8000/user/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data?.user) {
+          const user = data.data.user;
+
+          // Save in AuthContext
+          login(user, token);
+
+          // Redirect based on role
           if (user.account_type === "car_owner" && user.role === "car_owner") {
             navigate("/Customer_dashboard");
           } else if (
@@ -31,15 +45,15 @@ const CallbackPage = () => {
             navigate("/");
           }
         } else {
-          console.warn("❌ Not authenticated, redirecting to /");
+          console.warn("❌ Failed to fetch user, redirecting home");
           navigate("/");
         }
       })
-      .catch((err) => {
-        console.error("❌ Fetch /user/callback/me failed:", err);
+      .catch(err => {
+        console.error("❌ Fetch user failed:", err);
         navigate("/");
       });
-  }, [navigate, callbackLogin]);
+  }, [navigate, location, login]);
 
   return <p>Loading... Redirecting...</p>;
 };
