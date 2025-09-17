@@ -6,7 +6,7 @@ import { baseURL } from '../utils/environments';
 import axiosClient from '../axiosConfiguration/axiosClient';
 
 const CarFormPage = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, token } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
   
@@ -15,7 +15,7 @@ const CarFormPage = () => {
     if (!isAuthenticated || user?.account_type !== 'car_owner' || user?.role !== 'car_owner') {
       navigate('/login');
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, token, navigate]);
 
   const [formData, setFormData] = useState({
     model: '',

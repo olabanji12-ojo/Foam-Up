@@ -22,7 +22,7 @@ const CallbackPage = () => {
     localStorage.setItem("token", token);
 
     // Call your backend to fetch user details using the token
-    fetch("http://localhost:8000/user/me", {
+    fetch("https://car-wash-app-j54r.onrender.com/user/me", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
