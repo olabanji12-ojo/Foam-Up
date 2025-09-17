@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axiosClient from '../axiosConfiguration/axiosClient';
 
-
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -12,48 +11,52 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        console.log("🔄 Checking auth status with cookie...");
-  
-        const res = await axiosClient.get("/user/me");
-  
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        console.log("🔄 Checking auth status with token...");
+
+        const res = await axiosClient.get("/user/me"); // protected route
         console.log("✅ User loaded:", res.data.user);
+
         setUser(res.data.user);
         setIsAuthenticated(true);
-  
-        // Optionally sync token to localStorage
-        if (res.data.token) {
-          localStorage.setItem("token", res.data.token);
-        }
       } catch (error) {
         console.warn("Auth check failed:", error);
         setUser(null);
         setIsAuthenticated(false);
-        localStorage.removeItem("token"); // clear localStorage token if auth fails
+        localStorage.removeItem("token");
       } finally {
         setLoading(false);
       }
     };
-  
+
     initializeAuth();
   }, []);
-  
 
-  const logout = async () => {
-    try {
-      await axiosClient.post("/user/logout");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+  const login = async (email, password) => {
+    const res = await axiosClient.post("/user/login", { email, password });
+    const { token, user } = res.data;
+
+    localStorage.setItem("token", token);
+    setUser(user);
+    setIsAuthenticated(true);
+  };
+
+  const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem("token");
   };
-  
 
   const value = {
     user,
     isAuthenticated,
     loading,
+    login,
     logout,
   };
 
