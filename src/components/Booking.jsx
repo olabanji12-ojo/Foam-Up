@@ -91,9 +91,30 @@ const Booking = () => {
   };
 
   const getOpenHoursForDate = (carwash, date) => {
-    if (!carwash || !carwash.open_hours) return null;
-    const day = new Date(date).toLocaleString('en-US', { weekday: 'short' }).toLowerCase();
-    return carwash.open_hours[day];
+    if (!carwash || !carwash.open_hours) {
+      console.log("❌ No carwash or open_hours found");
+      return null;
+    }
+  
+    const daysMap = {
+      sun: 'sun',
+      mon: 'mon',
+      tue: 'tue',
+      wed: 'wed',
+      thu: 'thu',
+      fri: 'fri',
+      sat: 'sat',
+    };
+  
+    const dayShort = new Date(date).toLocaleString('en-US', { weekday: 'short' }).toLowerCase();
+    const key = daysMap[dayShort];
+  
+    console.log("📅 Selected Date:", date);
+    console.log("🗓 Weekday short name:", dayShort);
+    console.log("🔑 Mapped key for open_hours:", key);
+    console.log("⏰ Open hours found:", carwash.open_hours[key]);
+  
+    return carwash.open_hours[key] || null;
   };
 
   const getMinDate = () => {
